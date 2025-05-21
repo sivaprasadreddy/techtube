@@ -7,13 +7,47 @@
 <body>
 <div layout:fragment="content">
 
-    <!-- No Posts Message -->
-    <div th:if="${#lists.isEmpty(posts)}" class="alert alert-info">
-        No tutorials found.
-    </div>
-
     <div class="col-md-12">
-        <h2 class="mb-4">Latest Tutorials</h2>
+
+        <!-- Filter Form -->
+        <form id="filterForm" method="get" action="/posts" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="categoryId" class="form-label">Category</label>
+                    <select class="form-select" id="categoryId" name="categoryId" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        <option th:each="category : ${categories}" 
+                                th:value="${category.id}" 
+                                th:text="${category.name}"
+                                th:selected="${category.id == selectedCategoryId}">
+                            Category Name
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sortOptions" class="form-label">Sort By</label>
+                    <select class="form-select" id="sortOptions">
+                        <option value="createdAt_desc" th:selected="${sortBy == 'createdAt' && sortDirection == 'desc'}">Posted Date (Newest First)</option>
+                        <option value="createdAt_asc" th:selected="${sortBy == 'createdAt' && sortDirection == 'asc'}">Posted Date (Oldest First)</option>
+                    </select>
+                    <input type="hidden" id="sortBy" name="sortBy" th:value="${sortBy}">
+                    <input type="hidden" id="sortDirection" name="sortDirection" th:value="${sortDirection}">
+                </div>
+                <div class="col-md-6">
+                    <label for="searchTerm" class="form-label">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchTerm" name="searchTerm" 
+                               placeholder="Search tutorials..." th:value="${searchTerm}">
+                        <button class="btn btn-primary" type="submit">Search</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- No Posts Message -->
+        <div th:if="${#lists.isEmpty(posts.data)}" class="alert alert-info">
+            No tutorials found.
+        </div>
 
         <!-- Post Cards Grid -->
         <div class="row row-cols-1 row-cols-md-2 g-4">
@@ -51,27 +85,42 @@
         </div>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation" class="mt-4">
+        <nav aria-label="Page navigation" class="mt-4" th:if="${!#lists.isEmpty(posts.data)}">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${!posts.hasPrevious} ? disabled : ''">
                     <a class="page-link" href="#"
-                       th:href="${'/posts?page=1'}">First</a>
+                       th:href="@{/posts(page=1,categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">First</a>
                 </li>
                 <li class="page-item" th:classappend="${!posts.hasPrevious} ? disabled : ''">
                     <a class="page-link" href="#"
-                        th:href="${'/posts?page='+(posts.pageNumber - 1)}">Previous</a>
+                        th:href="@{/posts(page=${posts.pageNumber - 1},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Previous</a>
                 </li>
                 <li class="page-item" th:classappend="${!posts.hasNext} ? disabled : ''">
                     <a class="page-link" href="#"
-                       th:href="${'/posts?page='+(posts.pageNumber + 1)}">Next</a>
+                       th:href="@{/posts(page=${posts.pageNumber + 1},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Next</a>
                 </li>
                 <li class="page-item" th:classappend="${!posts.hasNext} ? disabled : ''">
                     <a class="page-link" href="#"
-                       th:href="${'/posts?page='+(posts.totalPages)}">Last</a>
+                       th:href="@{/posts(page=${posts.totalPages},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Last</a>
                 </li>
             </ul>
         </nav>
     </div>
+</div>
+
+<div layout:fragment="pageScripts">
+<script>
+    $(document).ready(function() {
+        $('#sortOptions').change(function() {
+            const selectedOption = this.value;
+            console.log(selectedOption);
+            const [sortBy, sortDirection] = selectedOption.split('_');
+            $('#sortBy').val(sortBy);
+            $('#sortDirection').val(sortDirection);
+            $('#filterForm').submit();
+        });
+    });
+</script>
 </div>
 </body>
 </html>

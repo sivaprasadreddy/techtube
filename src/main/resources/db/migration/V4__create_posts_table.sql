@@ -30,6 +30,6 @@ insert into posts(id, title, url, description, category_id, created_by, status) 
 (13, 'Simple Made Easy - Rich Hickey', 'https://www.youtube.com/watch?v=LKtk3HCgTa8', 'Simple Made Easy - Rich Hickey', 18, 2, 'APPROVED'),
 (14, 'TDD, Where Did It All Go Wrong (Ian Cooper)', 'https://www.youtube.com/watch?v=EZ05e7EMOLM', 'TDD, Where Did It All Go Wrong (Ian Cooper)', 1, 2, 'APPROVED'),
 (15, 'Rob Pike, Public Static Void', 'https://www.youtube.com/watch?v=5kj5ApnhPAE', 'Rob Pike, Public Static Void', 3, 2, 'APPROVED'),
-(16, 'The Why of Go', 'https://www.youtube.com/watch?v=bmZNaUcwBt4', 'The Why of Go', 1, 2, 'APPROVED'),
+(16, 'The Why of Go', 'https://www.youtube.com/watch?v=bmZNaUcwBt4', 'The Why of Go', 3, 2, 'APPROVED'),
 (17, 'OAuth 2.0 and OpenID Connect (in plain English)', 'https://www.youtube.com/watch?v=996OiexHze0', 'OAuth 2.0 and OpenID Connect (in plain English)', 16, 2, 'APPROVED')
 ;

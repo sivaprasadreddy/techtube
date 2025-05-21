@@ -12,4 +12,18 @@ interface PostRepository : JpaRepository<Post, Long> {
     """,
     )
     fun findAllPosts(pageable: Pageable): Page<Post>
+
+    @Query(
+        """
+        select p from Post p join fetch p.category join fetch p.createdBy
+        where (:categoryId is null or p.category.id = :categoryId)
+        and (:searchTerm is null or lower(p.title) like lower(concat('%', :searchTerm, '%'))
+             or lower(p.description) like lower(concat('%', :searchTerm, '%')))
+    """,
+    )
+    fun findPostsByCategoryAndSearchTerm(
+        categoryId: Long?,
+        searchTerm: String?,
+        pageable: Pageable,
+    ): Page<Post>
 }
