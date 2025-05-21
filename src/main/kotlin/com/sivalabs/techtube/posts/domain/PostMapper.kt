@@ -5,13 +5,8 @@ import com.sivalabs.techtube.users.domain.UserDTO
 import org.springframework.stereotype.Component
 
 @Component
-class PostMapper(
-    private val favoriteRepository: FavoriteRepository,
-) {
-    fun toDTO(
-        post: Post,
-        currentUser: User? = null,
-    ): PostDTO =
+class PostMapper {
+    fun toDTO(post: Post): PostDTO =
         PostDTO(
             id = post.id ?: 0,
             title = post.title,
@@ -21,16 +16,8 @@ class PostMapper(
             createdBy = toUserDTO(post.createdBy!!),
             status = post.status,
             createdAt = post.createdAt,
-            favorited =
-                currentUser?.let { user ->
-                    favoriteRepository.existsByUserAndPost(user, post)
-                } ?: false,
+            favorited = false,
         )
-
-    fun toDTOList(
-        posts: List<Post>,
-        currentUser: User? = null,
-    ): List<PostDTO> = posts.map { toDTO(it, currentUser) }
 
     private fun toCategoryDTO(category: Category): CategoryDTO =
         CategoryDTO(

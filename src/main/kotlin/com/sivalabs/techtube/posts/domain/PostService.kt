@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.Optional
+import kotlin.collections.contains
 import kotlin.collections.map
 
 @Service
@@ -32,12 +33,27 @@ class PostService(
 
         val postsPage =
             if (categoryId != null || !searchTerm.isNullOrBlank()) {
-                postRepository.findPostsByCategoryAndSearchTerm(categoryId, searchTerm, pageable).map { postMapper.toDTO(it, currentUser) }
+                postRepository.findPostsByCategoryAndSearchTerm(categoryId, searchTerm, pageable)
             } else {
-                postRepository.findAllPosts(pageable).map { postMapper.toDTO(it, currentUser) }
+                postRepository.findAllPosts(pageable)
             }
 
-        return PagedResult.of(postsPage)
+        if (currentUser == null) {
+            return PagedResult.of(postsPage.map { post -> postMapper.toDTO(post) })
+        }
+        val postIds = postsPage.content.map { post -> post.id!! }
+        val favouritedPostIds = postRepository.findFavouritePostIds(currentUser.id!!, postIds)
+        val postDTOsPage = postsPage.map { post -> mapToPostDTO(post, favouritedPostIds) }
+        return PagedResult.of(postDTOsPage)
+    }
+
+    private fun mapToPostDTO(
+        post: Post,
+        favouritedPostIds: List<Long>,
+    ): PostDTO {
+        val dto = postMapper.toDTO(post)
+        dto.favorited = favouritedPostIds.contains(post.id)
+        return dto
     }
 
     @Transactional
@@ -58,16 +74,13 @@ class PostService(
     }
 
     @Transactional(readOnly = true)
-    fun getPublishedPosts(currentUser: User? = null): List<PostDTO> =
-        postRepository.findAllPostsByStatus(PostStatus.APPROVED).map { postMapper.toDTO(it, currentUser) }
+    fun getPublishedPosts(): List<PostDTO> = postRepository.findAllPostsByStatus(PostStatus.APPROVED).map { postMapper.toDTO(it) }
 
     @Transactional(readOnly = true)
-    fun getPendingPosts(currentUser: User? = null): List<PostDTO> =
-        postRepository.findAllPostsByStatus(PostStatus.PENDING).map { postMapper.toDTO(it, currentUser) }
+    fun getPendingPosts(): List<PostDTO> = postRepository.findAllPostsByStatus(PostStatus.PENDING).map { postMapper.toDTO(it) }
 
     @Transactional(readOnly = true)
-    fun getRejectedPosts(currentUser: User? = null): List<PostDTO> =
-        postRepository.findAllPostsByStatus(PostStatus.REJECTED).map { postMapper.toDTO(it, currentUser) }
+    fun getRejectedPosts(): List<PostDTO> = postRepository.findAllPostsByStatus(PostStatus.REJECTED).map { postMapper.toDTO(it) }
 
     @Transactional
     fun approvePost(postId: Long) {

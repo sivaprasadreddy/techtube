@@ -45,4 +45,15 @@ interface PostRepository : JpaRepository<Post, Long> {
     """,
     )
     fun findPostsByUserId(userId: Long): List<Post>
+
+    @Query(
+        """
+        select f.post.id from Favorite f
+        where f.post.id in :postIds and f.user.id = :userId
+    """,
+    )
+    fun findFavouritePostIds(
+        userId: Long,
+        postIds: List<Long>,
+    ): List<Long>
 }
