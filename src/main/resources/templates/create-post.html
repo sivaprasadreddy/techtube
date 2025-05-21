@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Submit a Video</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead mb-4">Share your favorite technical videos with the community. Once
+                            submitted, your tutorial will be reviewed by an admin before being published.</p>
+
+                        <form id="post-form" method="post" action="/posts" th:action="@{/posts}"
+                              th:object="${postForm}">
+                            <!-- Title -->
+                            <div class="mb-3">
+                                <label for="post-title" class="form-label">Title <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="post-title"
+                                       placeholder="Enter the title of the tutorial" required>
+                                <div class="form-text">A clear, descriptive title that summarizes the content of the
+                                    tutorial.
+                                </div>
+                            </div>
+
+                            <!-- URL -->
+                            <div class="mb-3">
+                                <label for="post-url" class="form-label">URL <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" id="post-url"
+                                       placeholder="https://www.youtube.com/watch?v=..." required>
+                                <div class="form-text">The URL of the video tutorial (YouTube, Vimeo, etc.).</div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="post-description" class="form-label">Description <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control" id="post-description" rows="5"
+                                          placeholder="Describe what this tutorial covers..." required></textarea>
+                                <div class="form-text">A detailed description of what the tutorial covers and why it's
+                                    valuable.
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="mb-3">
+                                <label for="post-category" class="form-label">Category <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select" id="post-category" required>
+                                    <option value="" selected disabled>Select a category</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"
+                                            th:selected="${category.id == selectedCategoryId}">
+                                        Category Name
+                                    </option>
+                                </select>
+                                <div class="form-text">The primary technology or topic covered in the tutorial.</div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Submit Tutorial</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

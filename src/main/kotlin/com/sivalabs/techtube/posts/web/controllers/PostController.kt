@@ -37,4 +37,19 @@ class PostController(
 
         return "posts"
     }
+
+    @GetMapping("/posts/new")
+    fun showCreatePostForm(model: Model): String {
+        val categories = categoryService.getAllCategories()
+        model["categories"] = categories
+        model["postForm"] = CreatePostForm()
+        return "create-post"
+    }
+
+    class CreatePostForm(
+        var title: String = "",
+        var url: String = "",
+        var description: String = "",
+        var categoryId: Long? = 0,
+    )
 }

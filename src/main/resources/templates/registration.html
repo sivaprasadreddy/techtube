@@ -9,7 +9,7 @@
 </head>
 <body>
 <div layout:fragment="content">
-
+    <div class="container mt-5">
         <div class="col-md-6 offset-md-3">
 
             <div class="card">
@@ -17,7 +17,7 @@
                     <h3>Registration Form</h3>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-danger" role="alert"  th:if="${errorMessage}">
+                    <div class="alert alert-danger" role="alert" th:if="${errorMessage}">
                         <span th:text="${errorMessage}"></span>
                         <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
                     </div>
@@ -29,8 +29,10 @@
                                    th:field="*{email}"
                                    class="form-control"
                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
-                                   placeholder="Enter email" />
-                            <div class="invalid-feedback"  th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
+                                   placeholder="Enter email"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                Email Error
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password*</label>
@@ -38,8 +40,10 @@
                                    th:field="*{password}"
                                    class="form-control"
                                    th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
-                                   placeholder="Enter password" />
-                            <div class="invalid-feedback"  th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
+                                   placeholder="Enter password"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
+                                 th:errors="*{password}">Password Error
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="name" class="form-label">Name*</label>
@@ -48,7 +52,9 @@
                                    class="form-control"
                                    th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
                                    placeholder="Enter name"/>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name
+                                Error
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
@@ -58,6 +64,7 @@
                 </div>
             </div>
         </div>
+    </div>
 </div>
 
 </body>
