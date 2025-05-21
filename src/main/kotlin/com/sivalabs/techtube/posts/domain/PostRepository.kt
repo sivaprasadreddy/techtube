@@ -36,4 +36,13 @@ interface PostRepository : JpaRepository<Post, Long> {
     """,
     )
     fun findAllPostsByStatus(status: PostStatus): List<Post>
+
+    @Query(
+        """
+        select p from Post p join fetch p.category join fetch p.createdBy
+        where p.createdBy.id = :userId
+        order by p.createdAt desc
+    """,
+    )
+    fun findPostsByUserId(userId: Long): List<Post>
 }

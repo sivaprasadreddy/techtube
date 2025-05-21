@@ -43,6 +43,11 @@
                                 <i class="fa-solid fa-video"></i> Submit Video
                             </a>
                         </li>
+                        <li>
+                            <a class="dropdown-item" href="/posts/my-posts" th:href="@{/posts/my-posts}">
+                                <i class="fa-solid fa-user-tag"></i> My Posts
+                            </a>
+                        </li>
                         <li sec:authorize="hasRole('ADMIN')">
                             <a class="dropdown-item" href="/admin/review-posts" th:href="@{/admin/review-posts}">
                                 <i class="fa-solid fa-list-check"></i> Review Posts

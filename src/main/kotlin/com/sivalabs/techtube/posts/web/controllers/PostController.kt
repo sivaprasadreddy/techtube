@@ -164,4 +164,16 @@ class PostController(
         }
         return "redirect:/admin/review-posts"
     }
+
+    @GetMapping("/posts/my-posts")
+    fun showMyPosts(model: Model): String {
+        try {
+            val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
+            val posts = postService.getPostsByUser(userId)
+            model["posts"] = posts
+        } catch (e: Exception) {
+            model["errorMessage"] = e.message ?: "An error occurred while retrieving your posts."
+        }
+        return "my-posts"
+    }
 }

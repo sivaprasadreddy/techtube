@@ -43,7 +43,7 @@ class WebSecurityConfig {
                 .hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/posts", "/posts/**")
                 .authenticated()
-                .requestMatchers(HttpMethod.GET, "/posts/new")
+                .requestMatchers(HttpMethod.GET, "/posts/new", "/posts/my-posts")
                 .authenticated()
                 .requestMatchers(HttpMethod.GET, "/posts/**")
                 .permitAll()

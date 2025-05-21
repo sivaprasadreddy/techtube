@@ -97,4 +97,9 @@ class PostService(
     fun deletePost(postId: Long) {
         postRepository.deleteById(postId)
     }
+
+    @Transactional(readOnly = true)
+    fun getPostsByUser(userId: Long): List<Post> {
+        return postRepository.findPostsByUserId(userId)
+    }
 }
