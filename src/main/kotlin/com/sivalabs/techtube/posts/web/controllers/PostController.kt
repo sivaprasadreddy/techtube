@@ -13,6 +13,7 @@ import org.springframework.ui.set
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
@@ -61,7 +62,7 @@ class PostController(
         @Valid @ModelAttribute("postForm") form: CreatePostForm,
         bindingResult: BindingResult,
         model: Model,
-        redirectAttributes: RedirectAttributes
+        redirectAttributes: RedirectAttributes,
     ): String {
         if (bindingResult.hasErrors()) {
             model["categories"] = categoryService.getAllCategories()
@@ -71,11 +72,13 @@ class PostController(
         try {
             val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
 
-            val cmd = CreatePostCmd(title = form.title,
-                url = form.url,
-                description = form.description,
-                categoryId = form.categoryId!!,
-                userId = userId
+            val cmd =
+                CreatePostCmd(
+                    title = form.title,
+                    url = form.url,
+                    description = form.description,
+                    categoryId = form.categoryId!!,
+                    userId = userId,
                 )
             postService.createPost(cmd)
             redirectAttributes.addFlashAttribute("successMessage", "Your tutorial has been submitted and is pending review.")
@@ -90,13 +93,10 @@ class PostController(
     class CreatePostForm(
         @field:NotBlank(message = "Title is required")
         var title: String = "",
-
         @field:NotBlank(message = "URL is required")
         var url: String = "",
-
         @field:NotBlank(message = "Description is required")
         var description: String = "",
-
         @field:NotNull(message = "Category is required")
         var categoryId: Long? = null,
     )
@@ -105,5 +105,33 @@ class PostController(
     fun showSubmissions(model: Model): String {
         model["posts"] = postService.getPendingPosts()
         return "pending-posts"
+    }
+
+    @PostMapping("/admin/posts/{id}/approve")
+    fun approvePost(
+        @PathVariable id: Long,
+        redirectAttributes: RedirectAttributes,
+    ): String {
+        try {
+            postService.approvePost(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Post has been approved successfully.")
+        } catch (e: Exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while approving the post.")
+        }
+        return "redirect:/admin/pending-posts"
+    }
+
+    @PostMapping("/admin/posts/{id}/reject")
+    fun rejectPost(
+        @PathVariable id: Long,
+        redirectAttributes: RedirectAttributes,
+    ): String {
+        try {
+            postService.rejectPost(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Post has been rejected successfully.")
+        } catch (e: Exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while rejecting the post.")
+        }
+        return "redirect:/admin/pending-posts"
     }
 }

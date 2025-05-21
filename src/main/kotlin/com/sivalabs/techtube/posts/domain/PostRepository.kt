@@ -17,7 +17,7 @@ interface PostRepository : JpaRepository<Post, Long> {
     @Query(
         """
         select p from Post p join fetch p.category join fetch p.createdBy
-        where p.status = com.sivalabs.techtube.posts.domain.PostStatus.APPROVED 
+        where p.status = com.sivalabs.techtube.posts.domain.PostStatus.APPROVED
         and (:categoryId is null or p.category.id = :categoryId)
         and (:searchTerm is null or lower(p.title) like lower(concat('%', :searchTerm, '%'))
              or lower(p.description) like lower(concat('%', :searchTerm, '%')))
@@ -32,7 +32,7 @@ interface PostRepository : JpaRepository<Post, Long> {
     @Query(
         """
         select p from Post p join fetch p.category join fetch p.createdBy
-        where p.status = com.sivalabs.techtube.posts.domain.PostStatus.PENDING 
+        where p.status = com.sivalabs.techtube.posts.domain.PostStatus.PENDING
     """,
     )
     fun findAllPendingPosts(): List<Post>

@@ -55,7 +55,25 @@ class PostService(
     }
 
     @Transactional(readOnly = true)
-    fun getPendingPosts(): List<Post> {
-        return postRepository.findAllPendingPosts()
+    fun getPendingPosts(): List<Post> = postRepository.findAllPendingPosts()
+
+    @Transactional
+    fun approvePost(postId: Long) {
+        val post =
+            postRepository
+                .findById(postId)
+                .orElseThrow { IllegalArgumentException("Post not found with id: $postId") }
+        post.status = PostStatus.APPROVED
+        postRepository.save(post)
+    }
+
+    @Transactional
+    fun rejectPost(postId: Long) {
+        val post =
+            postRepository
+                .findById(postId)
+                .orElseThrow { IllegalArgumentException("Post not found with id: $postId") }
+        post.status = PostStatus.REJECTED
+        postRepository.save(post)
     }
 }
