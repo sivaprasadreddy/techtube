@@ -22,7 +22,7 @@ class RegistrationController(
     @GetMapping("/register")
     fun registerForm(model: Model): String {
         model["user"] = RegistrationRequest()
-        return "registration"
+        return "auth/registration"
     }
 
     @PostMapping("/register")
@@ -32,7 +32,7 @@ class RegistrationController(
         redirectAttributes: RedirectAttributes,
     ): String {
         if (bindingResult.hasErrors()) {
-            return "registration"
+            return "auth/registration"
         }
         try {
             val cmd = CreateUserCmd(user.name, user.email, user.password, Role.ROLE_USER)
@@ -41,7 +41,7 @@ class RegistrationController(
             return "redirect:/login"
         } catch (_: Exception) {
             bindingResult.addError(FieldError("user", "email", "User with email already exists"))
-            return "registration"
+            return "auth/registration"
         }
     }
 }

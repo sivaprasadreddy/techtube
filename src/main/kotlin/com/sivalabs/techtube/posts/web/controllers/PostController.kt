@@ -46,7 +46,7 @@ class PostController(
         model["sortBy"] = sortBy
         model["sortDirection"] = sortDirection
 
-        return "posts"
+        return "posts/posts"
     }
 
     @GetMapping("/posts/new")
@@ -54,7 +54,7 @@ class PostController(
         val categories = categoryService.getAllCategories()
         model["categories"] = categories
         model["postForm"] = CreatePostForm()
-        return "create-post"
+        return "posts/create-post"
     }
 
     @PostMapping("/posts")
@@ -66,7 +66,7 @@ class PostController(
     ): String {
         if (bindingResult.hasErrors()) {
             model["categories"] = categoryService.getAllCategories()
-            return "create-post"
+            return "posts/create-post"
         }
 
         try {
@@ -86,7 +86,7 @@ class PostController(
         } catch (e: Exception) {
             model["errorMessage"] = e.message ?: "An error occurred while submitting your tutorial."
             model["categories"] = categoryService.getAllCategories()
-            return "create-post"
+            return "posts/create-post"
         }
     }
 
@@ -101,12 +101,24 @@ class PostController(
         var categoryId: Long? = null,
     )
 
+    @GetMapping("/posts/my-posts")
+    fun showMyPosts(model: Model): String {
+        try {
+            val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
+            val posts = postService.getPostsByUser(userId)
+            model["posts"] = posts
+        } catch (e: Exception) {
+            model["errorMessage"] = e.message ?: "An error occurred while retrieving your posts."
+        }
+        return "posts/my-posts"
+    }
+
     @GetMapping("/admin/review-posts")
     fun showPostsToReview(model: Model): String {
         model["publishedPosts"] = postService.getPublishedPosts()
         model["pendingPosts"] = postService.getPendingPosts()
         model["rejectedPosts"] = postService.getRejectedPosts()
-        return "review-posts"
+        return "admin/review-posts"
     }
 
     @PostMapping("/admin/posts/{id}/approve")
@@ -163,17 +175,5 @@ class PostController(
             redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while deleting the post.")
         }
         return "redirect:/admin/review-posts"
-    }
-
-    @GetMapping("/posts/my-posts")
-    fun showMyPosts(model: Model): String {
-        try {
-            val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
-            val posts = postService.getPostsByUser(userId)
-            model["posts"] = posts
-        } catch (e: Exception) {
-            model["errorMessage"] = e.message ?: "An error occurred while retrieving your posts."
-        }
-        return "my-posts"
     }
 }
