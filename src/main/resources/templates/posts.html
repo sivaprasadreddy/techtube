@@ -15,32 +15,43 @@
     <div class="col-md-12">
         <h2 class="mb-4">Latest Tutorials</h2>
 
-        <!-- Post Cards -->
-        <div class="card mb-4" th:each="post : ${posts.data}">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="badge bg-primary" th:text="${post.category.name}">Category</span>
-                    <div>
-                        <button class="btn btn-sm btn-success vote-btn" data-post-id="1" data-vote-type="up">
-                            <i class="fas fa-thumbs-up"></i> <span class="vote-count">15</span>
-                        </button>
-                        <button class="btn btn-sm btn-danger vote-btn" data-post-id="1" data-vote-type="down">
-                            <i class="fas fa-thumbs-down"></i> <span class="vote-count">2</span>
-                        </button>
+        <!-- Post Cards Grid -->
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col" th:each="post : ${posts.data}">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <span class="badge bg-primary" th:text="${post.category.name}">Category</span>
                     </div>
-                </div>
-                <h3 class="card-title">
-                    <a href="#" class="text-decoration-none" th:text="${post.title}">Title</a>
-                </h3>
-                <p class="card-text" th:text="${post.description}">Description</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    <a href="#" class="btn btn-outline-primary">View Tutorial</a>
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${post.title}">Title</h5>
+                        <div class="ratio ratio-16x9 mb-3">
+                            <iframe th:with="videoId=${
+                                post.url.contains('?v=') ? 
+                                post.url.substring(post.url.lastIndexOf('?v=') + 3) : 
+                                (post.url.contains('youtu.be/') ? 
+                                post.url.substring(post.url.lastIndexOf('youtu.be/') + 9) : 
+                                post.url)
+                            }" 
+                            th:src="${'https://www.youtube.com/embed/' + videoId}" 
+                            title="YouTube video" allowfullscreen></iframe>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <button class="btn btn-sm btn-success vote-btn" th:data-post-id="${post.id}" data-vote-type="up">
+                                    <i class="fas fa-thumbs-up"></i> <span class="vote-count">15</span>
+                                </button>
+                                <button class="btn btn-sm btn-danger vote-btn" th:data-post-id="${post.id}" data-vote-type="down">
+                                    <i class="fas fa-thumbs-down"></i> <span class="vote-count">2</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Pagination -->
-        <nav aria-label="Page navigation">
+        <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${!posts.hasPrevious} ? disabled : ''">
                     <a class="page-link" href="#"

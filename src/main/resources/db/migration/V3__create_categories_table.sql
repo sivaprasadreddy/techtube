@@ -28,4 +28,6 @@ VALUES (1, 'Java'),
        (15, 'Web'),
        (16, 'Security'),
        (17, 'Testing'),
-       (18, 'Architecture');
+       (18, 'Architecture'),
+       (19, 'Career')
+;

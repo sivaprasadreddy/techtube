@@ -15,7 +15,7 @@ class PostService(
 ) {
     @Transactional(readOnly = true)
     fun getPosts(page: Int): PagedResult<Post> {
-        val pageable = PageRequest.of(page - 1, 5, Sort.by(Sort.Direction.DESC, "createdAt"))
+        val pageable = PageRequest.of(page - 1, 6, Sort.by(Sort.Direction.DESC, "createdAt"))
         val postsPage = postRepository.findAllPosts(pageable)
         return PagedResult.of(postsPage)
     }
