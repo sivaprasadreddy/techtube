@@ -28,10 +28,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="nav-link" href="/login"> Login </a>
+                    <a class="nav-link" href="/login"><i class="fa-solid fa-right-to-bracket"></i> Login </a>
                 </li>
                 <li class="nav-item" sec:authorize="!isAuthenticated()">
-                    <a class="nav-link" href="/register"> Register </a>
+                    <a class="nav-link" href="/register"><i class="fa-solid fa-user-plus"></i> Register </a>
                 </li>
                 <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -40,12 +40,12 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li>
                             <a class="dropdown-item" href="/posts/new" th:href="@{/posts/new}">
-                                Submit Video
+                                <i class="fa-solid fa-video"></i> Submit Video
                             </a>
                         </li>
                         <li sec:authorize="hasRole('ADMIN')">
                             <a class="dropdown-item" href="/admin/review-posts" th:href="@{/admin/review-posts}">
-                                Review Posts
+                                <i class="fa-solid fa-list-check"></i> Review Posts
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
