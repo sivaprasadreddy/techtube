@@ -32,8 +32,8 @@ interface PostRepository : JpaRepository<Post, Long> {
     @Query(
         """
         select p from Post p join fetch p.category join fetch p.createdBy
-        where p.status = com.sivalabs.techtube.posts.domain.PostStatus.PENDING
+        where p.status = :status
     """,
     )
-    fun findAllPendingPosts(): List<Post>
+    fun findAllPostsByStatus(status: PostStatus): List<Post>
 }

@@ -101,10 +101,12 @@ class PostController(
         var categoryId: Long? = null,
     )
 
-    @GetMapping("/admin/pending-posts")
-    fun showSubmissions(model: Model): String {
-        model["posts"] = postService.getPendingPosts()
-        return "pending-posts"
+    @GetMapping("/admin/review-posts")
+    fun showPostsToReview(model: Model): String {
+        model["publishedPosts"] = postService.getPublishedPosts()
+        model["pendingPosts"] = postService.getPendingPosts()
+        model["rejectedPosts"] = postService.getRejectedPosts()
+        return "review-posts"
     }
 
     @PostMapping("/admin/posts/{id}/approve")
@@ -118,7 +120,7 @@ class PostController(
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while approving the post.")
         }
-        return "redirect:/admin/pending-posts"
+        return "redirect:/admin/review-posts"
     }
 
     @PostMapping("/admin/posts/{id}/reject")
@@ -132,6 +134,34 @@ class PostController(
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while rejecting the post.")
         }
-        return "redirect:/admin/pending-posts"
+        return "redirect:/admin/review-posts"
+    }
+
+    @PostMapping("/admin/posts/{id}/unpublish")
+    fun unpublishPost(
+        @PathVariable id: Long,
+        redirectAttributes: RedirectAttributes,
+    ): String {
+        try {
+            postService.unpublishPost(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Post has been unpublished successfully.")
+        } catch (e: Exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while unpublishing the post.")
+        }
+        return "redirect:/admin/review-posts"
+    }
+
+    @PostMapping("/admin/posts/{id}/delete")
+    fun deletePost(
+        @PathVariable id: Long,
+        redirectAttributes: RedirectAttributes,
+    ): String {
+        try {
+            postService.deletePost(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Post has been deleted successfully.")
+        } catch (e: Exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while deleting the post.")
+        }
+        return "redirect:/admin/review-posts"
     }
 }
