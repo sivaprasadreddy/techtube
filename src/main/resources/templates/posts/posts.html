@@ -88,13 +88,8 @@
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <button class="btn btn-sm btn-success vote-btn" th:data-post-id="${post.id}"
-                                            data-vote-type="up">
-                                        <i class="fas fa-thumbs-up"></i> <span class="vote-count">15</span>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger vote-btn" th:data-post-id="${post.id}"
-                                            data-vote-type="down">
-                                        <i class="fas fa-thumbs-down"></i> <span class="vote-count">2</span>
+                                    <button class="btn btn-sm btn-danger" th:data-post-id="${post.id}">
+                                        <i class="fas fa-heart"></i>
                                     </button>
                                 </div>
                             </div>
