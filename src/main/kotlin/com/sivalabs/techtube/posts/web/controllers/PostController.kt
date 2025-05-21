@@ -1,17 +1,27 @@
 package com.sivalabs.techtube.posts.web.controllers
 
 import com.sivalabs.techtube.posts.domain.CategoryService
+import com.sivalabs.techtube.posts.domain.CreatePostCmd
 import com.sivalabs.techtube.posts.domain.PostService
+import com.sivalabs.techtube.users.domain.SecurityService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 class PostController(
     private val postService: PostService,
     private val categoryService: CategoryService,
+    private val securityService: SecurityService,
 ) {
     @GetMapping("/")
     fun home() = "redirect:/posts"
@@ -46,10 +56,54 @@ class PostController(
         return "create-post"
     }
 
+    @PostMapping("/posts")
+    fun createPost(
+        @Valid @ModelAttribute("postForm") form: CreatePostForm,
+        bindingResult: BindingResult,
+        model: Model,
+        redirectAttributes: RedirectAttributes
+    ): String {
+        if (bindingResult.hasErrors()) {
+            model["categories"] = categoryService.getAllCategories()
+            return "create-post"
+        }
+
+        try {
+            val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
+
+            val cmd = CreatePostCmd(title = form.title,
+                url = form.url,
+                description = form.description,
+                categoryId = form.categoryId!!,
+                userId = userId
+                )
+            postService.createPost(cmd)
+            redirectAttributes.addFlashAttribute("successMessage", "Your tutorial has been submitted and is pending review.")
+            return "redirect:/posts"
+        } catch (e: Exception) {
+            model["errorMessage"] = e.message ?: "An error occurred while submitting your tutorial."
+            model["categories"] = categoryService.getAllCategories()
+            return "create-post"
+        }
+    }
+
     class CreatePostForm(
+        @field:NotBlank(message = "Title is required")
         var title: String = "",
+
+        @field:NotBlank(message = "URL is required")
         var url: String = "",
+
+        @field:NotBlank(message = "Description is required")
         var description: String = "",
-        var categoryId: Long? = 0,
+
+        @field:NotNull(message = "Category is required")
+        var categoryId: Long? = null,
     )
+
+    @GetMapping("/admin/pending-posts")
+    fun showSubmissions(model: Model): String {
+        model["posts"] = postService.getPendingPosts()
+        return "pending-posts"
+    }
 }

@@ -1,6 +1,8 @@
 package com.sivalabs.techtube.posts.domain
 
 import com.sivalabs.techtube.common.models.PagedResult
+import com.sivalabs.techtube.users.domain.SecurityService
+import com.sivalabs.techtube.users.domain.UserRepository
 import com.sivalabs.techtube.users.domain.UserService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -12,6 +14,8 @@ class PostService(
     private val postRepository: PostRepository,
     private val categoryRepository: CategoryRepository,
     private val userService: UserService,
+    private val userRepository: UserRepository,
+    private val securityService: SecurityService,
 ) {
     @Transactional(readOnly = true)
     fun getPosts(
@@ -32,5 +36,26 @@ class PostService(
             }
 
         return PagedResult.of(postsPage)
+    }
+
+    @Transactional
+    fun createPost(cmd: CreatePostCmd) {
+        val user = userRepository.findById(cmd.userId).orElseThrow { IllegalStateException("User not found") }
+        val category = categoryRepository.findById(cmd.categoryId).orElseThrow { IllegalArgumentException("Category not found") }
+
+        val post = Post()
+        post.title = cmd.title
+        post.url = cmd.url
+        post.description = cmd.description
+        post.category = category
+        post.createdBy = user
+        post.status = PostStatus.PENDING
+
+        postRepository.save(post)
+    }
+
+    @Transactional(readOnly = true)
+    fun getPendingPosts(): List<Post> {
+        return postRepository.findAllPendingPosts()
     }
 }

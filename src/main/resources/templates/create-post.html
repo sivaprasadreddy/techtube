@@ -17,35 +17,52 @@
                         <p class="lead mb-4">Share your favorite technical videos with the community. Once
                             submitted, your tutorial will be reviewed by an admin before being published.</p>
 
+                        <div class="alert alert-danger" role="alert" th:if="${errorMessage}">
+                            <span th:text="${errorMessage}"></span>
+                            <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+                        </div>
+
                         <form id="post-form" method="post" action="/posts" th:action="@{/posts}"
                               th:object="${postForm}">
                             <!-- Title -->
                             <div class="mb-3">
                                 <label for="post-title" class="form-label">Title <span
                                         class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="post-title"
-                                       placeholder="Enter the title of the tutorial" required>
+                                <input type="text" class="form-control" id="post-title" th:field="*{title}"
+                                       th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                                       placeholder="Enter the title of the tutorial">
                                 <div class="form-text">A clear, descriptive title that summarizes the content of the
                                     tutorial.
+                                </div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">
+                                    Title Error
                                 </div>
                             </div>
 
                             <!-- URL -->
                             <div class="mb-3">
                                 <label for="post-url" class="form-label">URL <span class="text-danger">*</span></label>
-                                <input type="url" class="form-control" id="post-url"
-                                       placeholder="https://www.youtube.com/watch?v=..." required>
+                                <input type="url" class="form-control" id="post-url" th:field="*{url}"
+                                       th:classappend="${#fields.hasErrors('url')} ? 'is-invalid' : ''"
+                                       placeholder="https://www.youtube.com/watch?v=...">
                                 <div class="form-text">The URL of the video tutorial (YouTube, Vimeo, etc.).</div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('url')}" th:errors="*{url}">
+                                    URL Error
+                                </div>
                             </div>
 
                             <!-- Description -->
                             <div class="mb-3">
                                 <label for="post-description" class="form-label">Description <span
                                         class="text-danger">*</span></label>
-                                <textarea class="form-control" id="post-description" rows="5"
-                                          placeholder="Describe what this tutorial covers..." required></textarea>
+                                <textarea class="form-control" id="post-description" th:field="*{description}" rows="5"
+                                          th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
+                                          placeholder="Describe what this tutorial covers..."></textarea>
                                 <div class="form-text">A detailed description of what the tutorial covers and why it's
                                     valuable.
+                                </div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                                    Description Error
                                 </div>
                             </div>
 
@@ -53,16 +70,20 @@
                             <div class="mb-3">
                                 <label for="post-category" class="form-label">Category <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select" id="post-category" required>
+                                <select class="form-select" id="post-category" th:field="*{categoryId}" 
+                                        th:classappend="${#fields.hasErrors('categoryId')} ? 'is-invalid' : ''"
+                                        >
                                     <option value="" selected disabled>Select a category</option>
                                     <option th:each="category : ${categories}"
                                             th:value="${category.id}"
-                                            th:text="${category.name}"
-                                            th:selected="${category.id == selectedCategoryId}">
+                                            th:text="${category.name}">
                                         Category Name
                                     </option>
                                 </select>
                                 <div class="form-text">The primary technology or topic covered in the tutorial.</div>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}">
+                                    Category Error
+                                </div>
                             </div>
 
                             <div class="d-grid gap-2">

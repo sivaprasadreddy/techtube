@@ -39,6 +39,8 @@ class WebSecurityConfig {
                 .permitAll()
                 .requestMatchers(*publicResources)
                 .permitAll()
+                .requestMatchers( "/admin/**")
+                .hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/posts", "/posts/**")
                 .authenticated()
                 .requestMatchers(HttpMethod.GET, "/posts/new")
