@@ -4,6 +4,8 @@ import com.sivalabs.techtube.posts.domain.CategoryService
 import com.sivalabs.techtube.posts.domain.CreatePostCmd
 import com.sivalabs.techtube.posts.domain.PostService
 import com.sivalabs.techtube.users.domain.SecurityService
+import com.sivalabs.techtube.users.domain.UserRepository
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -16,13 +18,16 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.servlet.View
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
+import org.springframework.web.servlet.view.FragmentsRendering
 
 @Controller
 class PostController(
     private val postService: PostService,
     private val categoryService: CategoryService,
     private val securityService: SecurityService,
+    private val userRepository: UserRepository,
 ) {
     @GetMapping("/")
     fun home() = "redirect:/posts"
@@ -36,7 +41,11 @@ class PostController(
         @RequestParam(defaultValue = "desc") sortDirection: String,
         model: Model,
     ): String {
-        val posts = postService.getPosts(page, categoryId, searchTerm, sortBy, sortDirection)
+        val currentUser =
+            securityService.getLoginUserId()?.let { userId ->
+                userRepository.findById(userId).orElse(null)
+            }
+        val posts = postService.getPosts(page, categoryId, searchTerm, sortBy, sortDirection, currentUser)
         val categories = categoryService.getAllCategories()
 
         model["posts"] = posts
@@ -70,7 +79,7 @@ class PostController(
         }
 
         try {
-            val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
+            val userId = securityService.getLoginUserIdOrThrow()
 
             val cmd =
                 CreatePostCmd(
@@ -81,7 +90,10 @@ class PostController(
                     userId = userId,
                 )
             postService.createPost(cmd)
-            redirectAttributes.addFlashAttribute("successMessage", "Your video has been submitted and is pending review")
+            redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Your video has been submitted and is pending review",
+            )
             return "redirect:/posts"
         } catch (e: Exception) {
             model["errorMessage"] = e.message ?: "An error occurred while submitting your tutorial."
@@ -104,7 +116,7 @@ class PostController(
     @GetMapping("/posts/my-posts")
     fun showMyPosts(model: Model): String {
         try {
-            val userId = securityService.getLoginUserId() ?: throw IllegalStateException("User not authenticated")
+            val userId = securityService.getLoginUserIdOrThrow()
             val posts = postService.getPostsByUser(userId)
             model["posts"] = posts
         } catch (e: Exception) {
@@ -130,7 +142,10 @@ class PostController(
             postService.approvePost(id)
             redirectAttributes.addFlashAttribute("successMessage", "Post has been approved successfully.")
         } catch (e: Exception) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while approving the post.")
+            redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                e.message ?: "An error occurred while approving the post.",
+            )
         }
         return "redirect:/admin/review-posts"
     }
@@ -144,7 +159,10 @@ class PostController(
             postService.rejectPost(id)
             redirectAttributes.addFlashAttribute("successMessage", "Post has been rejected successfully.")
         } catch (e: Exception) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while rejecting the post.")
+            redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                e.message ?: "An error occurred while rejecting the post.",
+            )
         }
         return "redirect:/admin/review-posts"
     }
@@ -158,7 +176,10 @@ class PostController(
             postService.unpublishPost(id)
             redirectAttributes.addFlashAttribute("successMessage", "Post has been unpublished successfully.")
         } catch (e: Exception) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while unpublishing the post.")
+            redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                e.message ?: "An error occurred while unpublishing the post.",
+            )
         }
         return "redirect:/admin/review-posts"
     }
@@ -172,8 +193,33 @@ class PostController(
             postService.deletePost(id)
             redirectAttributes.addFlashAttribute("successMessage", "Post has been deleted successfully.")
         } catch (e: Exception) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.message ?: "An error occurred while deleting the post.")
+            redirectAttributes.addFlashAttribute(
+                "errorMessage",
+                e.message ?: "An error occurred while deleting the post.",
+            )
         }
         return "redirect:/admin/review-posts"
+    }
+
+    @PostMapping("/posts/{id}/favorite")
+    @HxRequest
+    fun favoritePost(
+        @PathVariable id: Long,
+    ): View {
+        val userId = securityService.getLoginUserIdOrThrow()
+        postService.favoritePost(id, userId)
+        val post = postService.getPostById(id).orElseThrow { IllegalStateException("Post not found") }
+        return FragmentsRendering.with("partials/unfavourite-post", mapOf("post" to post)).build()
+    }
+
+    @PostMapping("/posts/{id}/unfavorite")
+    @HxRequest
+    fun unfavoritePost(
+        @PathVariable id: Long,
+    ): View {
+        val userId = securityService.getLoginUserIdOrThrow()
+        postService.unfavoritePost(id, userId)
+        val post = postService.getPostById(id).orElseThrow { IllegalStateException("Post not found") }
+        return FragmentsRendering.with("partials/favourite-post", mapOf("post" to post)).build()
     }
 }

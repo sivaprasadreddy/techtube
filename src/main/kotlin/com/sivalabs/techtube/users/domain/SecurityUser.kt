@@ -6,6 +6,7 @@ import java.io.Serial
 import java.io.Serializable
 
 class SecurityUser(
+    private val id: Long,
     private val name: String,
     private val email: String,
     private val password: String,
@@ -18,6 +19,8 @@ class SecurityUser(
     }
 
     fun getName() = name
+
+    fun getId() = id
 
     override fun getAuthorities() = setOf(SimpleGrantedAuthority(role.name))
 

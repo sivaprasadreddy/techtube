@@ -4,13 +4,15 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
-class SecurityService(
-    private val userRepository: UserRepository,
-) {
+class SecurityService {
+    fun getLoginUserIdOrThrow(): Long = getLoginUserId() ?: throw IllegalStateException("User not authenticated")
+
     fun getLoginUserId(): Long? {
         SecurityContextHolder.getContext().authentication?.let {
-            val username = it.name
-            return userRepository.findByEmail(username)?.id
+            if (it.principal is SecurityUser) {
+                return (it.principal as SecurityUser).getId()
+            }
+            return null
         }
         return null
     }

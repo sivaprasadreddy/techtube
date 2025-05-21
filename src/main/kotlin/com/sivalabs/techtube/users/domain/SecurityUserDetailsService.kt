@@ -14,6 +14,7 @@ class SecurityUserDetailsService(
             userService.findByEmail(username)
                 ?: throw UsernameNotFoundException("Invalid username/password.")
         return SecurityUser(
+            user.id!!,
             user.name,
             user.email,
             user.password,

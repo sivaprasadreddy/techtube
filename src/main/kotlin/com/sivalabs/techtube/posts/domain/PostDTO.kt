@@ -12,4 +12,5 @@ data class PostDTO(
     val createdBy: UserDTO,
     val status: PostStatus,
     val createdAt: LocalDateTime,
+    val favorited: Boolean = false,
 )

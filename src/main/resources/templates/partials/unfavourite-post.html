@@ -1,0 +1,9 @@
+<form th:method="post">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <button type="submit" class="btn btn-sm btn-danger favorite-btn"
+            th:hx-post="@{/posts/{id}/unfavorite(id=${post.id})}"
+            th:hx-target="'closest form'"
+            th:hx-swap="'outerHTML'">
+        <i class="fas fa-heart"></i>
+    </button>
+</form>
