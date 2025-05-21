@@ -50,7 +50,6 @@ class WebSecurityConfig {
                 .anyRequest()
                 .authenticated()
         }
-        http.csrf { c -> c.disable() }
         http.formLogin { formLogin -> formLogin.loginPage("/login").permitAll().defaultSuccessUrl("/") }
         http.logout { logout ->
             logout

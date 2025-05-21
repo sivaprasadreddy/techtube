@@ -81,7 +81,7 @@ class PostController(
                     userId = userId,
                 )
             postService.createPost(cmd)
-            redirectAttributes.addFlashAttribute("successMessage", "Your tutorial has been submitted and is pending review.")
+            redirectAttributes.addFlashAttribute("successMessage", "Your video has been submitted and is pending review")
             return "redirect:/posts"
         } catch (e: Exception) {
             model["errorMessage"] = e.message ?: "An error occurred while submitting your tutorial."
