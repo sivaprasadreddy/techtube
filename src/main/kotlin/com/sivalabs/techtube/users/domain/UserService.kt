@@ -12,15 +12,15 @@ class UserService(
 ) {
     fun findByEmail(email: String): User? = userRepository.findByEmail(email)
 
-    fun createUser(user: RegistrationRequest): User {
-        if (userRepository.findByEmail(user.email) != null) {
-            throw UserAlreadyExistsException("User with email ${user.email} already exists")
+    fun createUser(cmd: CreateUserCmd): User {
+        if (userRepository.findByEmail(cmd.email) != null) {
+            throw UserAlreadyExistsException("User with email ${cmd.email} already exists")
         }
         val newUser = User()
-        newUser.name = user.name
-        newUser.email = user.email
-        newUser.password = passwordEncoder.encode(user.password)
-        newUser.role = Role.ROLE_USER
+        newUser.name = cmd.name
+        newUser.email = cmd.email
+        newUser.password = passwordEncoder.encode(cmd.password)
+        newUser.role = cmd.role
         return userRepository.save(newUser)
     }
 }

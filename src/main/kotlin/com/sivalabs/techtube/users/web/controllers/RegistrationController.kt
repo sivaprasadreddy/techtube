@@ -1,7 +1,9 @@
 package com.sivalabs.techtube.users.web.controllers
 
-import com.sivalabs.techtube.users.domain.RegistrationRequest
+import com.sivalabs.techtube.users.domain.CreateUserCmd
+import com.sivalabs.techtube.users.domain.Role
 import com.sivalabs.techtube.users.domain.UserService
+import com.sivalabs.techtube.users.web.dto.RegistrationRequest
 import jakarta.validation.Valid
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -33,7 +35,8 @@ class RegistrationController(
             return "registration"
         }
         try {
-            userService.createUser(user)
+            val cmd = CreateUserCmd(user.name, user.email, user.password, Role.ROLE_USER)
+            userService.createUser(cmd)
             redirectAttributes.addFlashAttribute("message", "Registration successful")
             return "redirect:/login"
         } catch (_: Exception) {

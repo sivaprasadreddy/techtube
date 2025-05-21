@@ -1,21 +1,19 @@
 package com.sivalabs.techtube.posts.domain
 
 import com.sivalabs.techtube.common.models.PagedResult
-import com.sivalabs.techtube.users.domain.SecurityService
 import com.sivalabs.techtube.users.domain.UserRepository
-import com.sivalabs.techtube.users.domain.UserService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.collections.map
 
 @Service
 class PostService(
     private val postRepository: PostRepository,
     private val categoryRepository: CategoryRepository,
-    private val userService: UserService,
     private val userRepository: UserRepository,
-    private val securityService: SecurityService,
+    private val postMapper: PostMapper,
 ) {
     @Transactional(readOnly = true)
     fun getPosts(
@@ -24,15 +22,15 @@ class PostService(
         searchTerm: String? = null,
         sortBy: String = "createdAt",
         sortDirection: String = "desc",
-    ): PagedResult<Post> {
+    ): PagedResult<PostDTO> {
         val direction = if (sortDirection.equals("asc", ignoreCase = true)) Sort.Direction.ASC else Sort.Direction.DESC
         val pageable = PageRequest.of(page - 1, 6, Sort.by(direction, sortBy))
 
         val postsPage =
             if (categoryId != null || !searchTerm.isNullOrBlank()) {
-                postRepository.findPostsByCategoryAndSearchTerm(categoryId, searchTerm, pageable)
+                postRepository.findPostsByCategoryAndSearchTerm(categoryId, searchTerm, pageable).map { postMapper.toDTO(it) }
             } else {
-                postRepository.findAllPosts(pageable)
+                postRepository.findAllPosts(pageable).map { postMapper.toDTO(it) }
             }
 
         return PagedResult.of(postsPage)
@@ -55,13 +53,13 @@ class PostService(
     }
 
     @Transactional(readOnly = true)
-    fun getPublishedPosts(): List<Post> = postRepository.findAllPostsByStatus(PostStatus.APPROVED)
+    fun getPublishedPosts(): List<PostDTO> = postRepository.findAllPostsByStatus(PostStatus.APPROVED).map { postMapper.toDTO(it) }
 
     @Transactional(readOnly = true)
-    fun getPendingPosts(): List<Post> = postRepository.findAllPostsByStatus(PostStatus.PENDING)
+    fun getPendingPosts(): List<PostDTO> = postRepository.findAllPostsByStatus(PostStatus.PENDING).map { postMapper.toDTO(it) }
 
     @Transactional(readOnly = true)
-    fun getRejectedPosts(): List<Post> = postRepository.findAllPostsByStatus(PostStatus.REJECTED)
+    fun getRejectedPosts(): List<PostDTO> = postRepository.findAllPostsByStatus(PostStatus.REJECTED).map { postMapper.toDTO(it) }
 
     @Transactional
     fun approvePost(postId: Long) {
@@ -99,7 +97,5 @@ class PostService(
     }
 
     @Transactional(readOnly = true)
-    fun getPostsByUser(userId: Long): List<Post> {
-        return postRepository.findPostsByUserId(userId)
-    }
+    fun getPostsByUser(userId: Long): List<Post> = postRepository.findPostsByUserId(userId)
 }

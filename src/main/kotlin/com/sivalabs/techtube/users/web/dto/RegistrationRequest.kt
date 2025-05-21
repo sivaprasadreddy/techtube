@@ -1,4 +1,4 @@
-package com.sivalabs.techtube.users.domain
+package com.sivalabs.techtube.users.web.dto
 
 import jakarta.validation.constraints.NotBlank
 
