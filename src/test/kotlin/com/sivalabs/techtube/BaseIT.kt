@@ -14,4 +14,9 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester
 @AutoConfigureMockMvc
 abstract class BaseIT {
     @Autowired lateinit var mockMvcTester: MockMvcTester
+
+    companion object {
+        const val ADMIN_USER_EMAIL = "admin@gmail.com"
+        const val NORMAL_USER_EMAIL = "siva@gmail.com"
+    }
 }

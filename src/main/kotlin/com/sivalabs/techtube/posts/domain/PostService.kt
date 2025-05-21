@@ -37,7 +37,7 @@ class PostService(
     }
 
     @Transactional
-    fun createPost(cmd: CreatePostCmd) {
+    fun createPost(cmd: CreatePostCmd): Long {
         val user = userRepository.findById(cmd.userId).orElseThrow { IllegalStateException("User not found") }
         val category = categoryRepository.findById(cmd.categoryId).orElseThrow { IllegalArgumentException("Category not found") }
 
@@ -50,6 +50,7 @@ class PostService(
         post.status = PostStatus.PENDING
 
         postRepository.save(post)
+        return post.id!!
     }
 
     @Transactional(readOnly = true)

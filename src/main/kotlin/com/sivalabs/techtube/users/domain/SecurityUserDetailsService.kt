@@ -1,7 +1,5 @@
 package com.sivalabs.techtube.users.domain
 
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -15,12 +13,11 @@ class SecurityUserDetailsService(
         val user =
             userService.findByEmail(username)
                 ?: throw UsernameNotFoundException("Invalid username/password.")
-        return org.springframework.security.core.userdetails.User(
+        return SecurityUser(
+            user.name,
             user.email,
             user.password,
-            getAuthorities(user),
+            user.role,
         )
     }
-
-    private fun getAuthorities(user: User): List<GrantedAuthority> = listOf(SimpleGrantedAuthority(user.role.name))
 }
