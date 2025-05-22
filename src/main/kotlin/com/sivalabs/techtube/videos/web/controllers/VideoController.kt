@@ -1,10 +1,10 @@
-package com.sivalabs.techtube.posts.web.controllers
+package com.sivalabs.techtube.videos.web.controllers
 
-import com.sivalabs.techtube.posts.domain.CategoryService
-import com.sivalabs.techtube.posts.domain.CreatePostCmd
-import com.sivalabs.techtube.posts.domain.PostService
 import com.sivalabs.techtube.users.domain.SecurityService
 import com.sivalabs.techtube.users.domain.UserRepository
+import com.sivalabs.techtube.videos.domain.CategoryService
+import com.sivalabs.techtube.videos.domain.CreateVideoCmd
+import com.sivalabs.techtube.videos.domain.VideoService
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -23,17 +23,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.FragmentsRendering
 
 @Controller
-class PostController(
-    private val postService: PostService,
+class VideoController(
+    private val videoService: VideoService,
     private val categoryService: CategoryService,
     private val securityService: SecurityService,
     private val userRepository: UserRepository,
 ) {
     @GetMapping("/")
-    fun home() = "redirect:/posts"
+    fun home() = "redirect:/videos"
 
-    @GetMapping("/posts")
-    fun showPosts(
+    @GetMapping("/videos")
+    fun showVideos(
         @RequestParam(defaultValue = "1") page: Int,
         @RequestParam(required = false) categoryId: Long?,
         @RequestParam(required = false) searchTerm: String?,
@@ -45,64 +45,64 @@ class PostController(
             securityService.getLoginUserId()?.let { userId ->
                 userRepository.findById(userId).orElse(null)
             }
-        val posts = postService.getPosts(page, categoryId, searchTerm, sortBy, sortDirection, currentUser)
+        val videos = videoService.getVideos(page, categoryId, searchTerm, sortBy, sortDirection, currentUser)
         val categories = categoryService.getAllCategories()
 
-        model["posts"] = posts
+        model["videos"] = videos
         model["categories"] = categories
         model["selectedCategoryId"] = categoryId
         model["searchTerm"] = searchTerm ?: ""
         model["sortBy"] = sortBy
         model["sortDirection"] = sortDirection
 
-        return "posts/posts"
+        return "videos/videos"
     }
 
-    @GetMapping("/posts/new")
-    fun showCreatePostForm(model: Model): String {
+    @GetMapping("/videos/new")
+    fun showCreateVideoForm(model: Model): String {
         val categories = categoryService.getAllCategories()
         model["categories"] = categories
-        model["postForm"] = CreatePostForm()
-        return "posts/create-post"
+        model["videoForm"] = CreateVideoForm()
+        return "videos/create-video"
     }
 
-    @PostMapping("/posts")
-    fun createPost(
-        @Valid @ModelAttribute("postForm") form: CreatePostForm,
+    @PostMapping("/videos")
+    fun createVideo(
+        @Valid @ModelAttribute("videoForm") form: CreateVideoForm,
         bindingResult: BindingResult,
         model: Model,
         redirectAttributes: RedirectAttributes,
     ): String {
         if (bindingResult.hasErrors()) {
             model["categories"] = categoryService.getAllCategories()
-            return "posts/create-post"
+            return "videos/create-video"
         }
 
         try {
             val userId = securityService.getLoginUserIdOrThrow()
 
             val cmd =
-                CreatePostCmd(
+                CreateVideoCmd(
                     title = form.title,
                     url = form.url,
                     description = form.description,
                     categoryId = form.categoryId!!,
                     userId = userId,
                 )
-            postService.createPost(cmd)
+            videoService.createVideo(cmd)
             redirectAttributes.addFlashAttribute(
                 "successMessage",
                 "Your video has been submitted and is pending review",
             )
-            return "redirect:/posts"
+            return "redirect:/videos"
         } catch (e: Exception) {
             model["errorMessage"] = e.message ?: "An error occurred while submitting your tutorial."
             model["categories"] = categoryService.getAllCategories()
-            return "posts/create-post"
+            return "videos/create-video"
         }
     }
 
-    class CreatePostForm(
+    class CreateVideoForm(
         @field:NotBlank(message = "Title is required")
         var title: String = "",
         @field:NotBlank(message = "URL is required")
@@ -113,113 +113,113 @@ class PostController(
         var categoryId: Long? = null,
     )
 
-    @GetMapping("/posts/my-posts")
-    fun showMyPosts(model: Model): String {
+    @GetMapping("/videos/my-videos")
+    fun showMyVideos(model: Model): String {
         try {
             val userId = securityService.getLoginUserIdOrThrow()
-            val posts = postService.getPostsByUser(userId)
-            model["posts"] = posts
+            val videos = videoService.getVideosByUser(userId)
+            model["videos"] = videos
         } catch (e: Exception) {
-            model["errorMessage"] = e.message ?: "An error occurred while retrieving your posts."
+            model["errorMessage"] = e.message ?: "An error occurred while retrieving your videos."
         }
-        return "posts/my-posts"
+        return "videos/my-videos"
     }
 
-    @GetMapping("/admin/review-posts")
-    fun showPostsToReview(model: Model): String {
-        model["publishedPosts"] = postService.getPublishedPosts()
-        model["pendingPosts"] = postService.getPendingPosts()
-        model["rejectedPosts"] = postService.getRejectedPosts()
-        return "admin/review-posts"
+    @GetMapping("/admin/review-videos")
+    fun showVideosToReview(model: Model): String {
+        model["publishedVideos"] = videoService.getPublishedVideos()
+        model["pendingVideos"] = videoService.getPendingVideos()
+        model["rejectedVideos"] = videoService.getRejectedVideos()
+        return "admin/review-videos"
     }
 
-    @PostMapping("/admin/posts/{id}/approve")
-    fun approvePost(
+    @PostMapping("/admin/videos/{id}/approve")
+    fun approveVideo(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
     ): String {
         try {
-            postService.approvePost(id)
-            redirectAttributes.addFlashAttribute("successMessage", "Post has been approved successfully.")
+            videoService.approveVideo(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Video has been approved successfully.")
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute(
                 "errorMessage",
-                e.message ?: "An error occurred while approving the post.",
+                e.message ?: "An error occurred while approving the video.",
             )
         }
-        return "redirect:/admin/review-posts"
+        return "redirect:/admin/review-videos"
     }
 
-    @PostMapping("/admin/posts/{id}/reject")
-    fun rejectPost(
+    @PostMapping("/admin/videos/{id}/reject")
+    fun rejectVideo(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
     ): String {
         try {
-            postService.rejectPost(id)
-            redirectAttributes.addFlashAttribute("successMessage", "Post has been rejected successfully.")
+            videoService.rejectVideo(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Video has been rejected successfully.")
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute(
                 "errorMessage",
-                e.message ?: "An error occurred while rejecting the post.",
+                e.message ?: "An error occurred while rejecting the video.",
             )
         }
-        return "redirect:/admin/review-posts"
+        return "redirect:/admin/review-videos"
     }
 
-    @PostMapping("/admin/posts/{id}/unpublish")
-    fun unpublishPost(
+    @PostMapping("/admin/videos/{id}/unpublish")
+    fun unpublishVideo(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
     ): String {
         try {
-            postService.unpublishPost(id)
-            redirectAttributes.addFlashAttribute("successMessage", "Post has been unpublished successfully.")
+            videoService.unpublishVideo(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Video has been unpublished successfully.")
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute(
                 "errorMessage",
-                e.message ?: "An error occurred while unpublishing the post.",
+                e.message ?: "An error occurred while unpublishing the video.",
             )
         }
-        return "redirect:/admin/review-posts"
+        return "redirect:/admin/review-videos"
     }
 
-    @PostMapping("/admin/posts/{id}/delete")
-    fun deletePost(
+    @PostMapping("/admin/videos/{id}/delete")
+    fun deleteVideo(
         @PathVariable id: Long,
         redirectAttributes: RedirectAttributes,
     ): String {
         try {
-            postService.deletePost(id)
-            redirectAttributes.addFlashAttribute("successMessage", "Post has been deleted successfully.")
+            videoService.deleteVideo(id)
+            redirectAttributes.addFlashAttribute("successMessage", "Video has been deleted successfully.")
         } catch (e: Exception) {
             redirectAttributes.addFlashAttribute(
                 "errorMessage",
-                e.message ?: "An error occurred while deleting the post.",
+                e.message ?: "An error occurred while deleting the video.",
             )
         }
-        return "redirect:/admin/review-posts"
+        return "redirect:/admin/review-videos"
     }
 
-    @PostMapping("/posts/{id}/favorite")
+    @PostMapping("/videos/{id}/favorite")
     @HxRequest
-    fun favoritePost(
+    fun favoriteVideo(
         @PathVariable id: Long,
     ): View {
         val userId = securityService.getLoginUserIdOrThrow()
-        postService.favoritePost(id, userId)
-        val post = postService.getPostById(id).orElseThrow { IllegalStateException("Post not found") }
-        return FragmentsRendering.with("partials/unfavourite-post", mapOf("post" to post)).build()
+        videoService.favoriteVideo(id, userId)
+        val video = videoService.getVideoById(id).orElseThrow { IllegalStateException("Video not found") }
+        return FragmentsRendering.with("partials/unfavourite-video", mapOf("video" to video)).build()
     }
 
-    @PostMapping("/posts/{id}/unfavorite")
+    @PostMapping("/videos/{id}/unfavorite")
     @HxRequest
-    fun unfavoritePost(
+    fun unfavoriteVideo(
         @PathVariable id: Long,
     ): View {
         val userId = securityService.getLoginUserIdOrThrow()
-        postService.unfavoritePost(id, userId)
-        val post = postService.getPostById(id).orElseThrow { IllegalStateException("Post not found") }
-        return FragmentsRendering.with("partials/favourite-post", mapOf("post" to post)).build()
+        videoService.unfavoriteVideo(id, userId)
+        val video = videoService.getVideoById(id).orElseThrow { IllegalStateException("Video not found") }
+        return FragmentsRendering.with("partials/favourite-video", mapOf("video" to video)).build()
     }
 }

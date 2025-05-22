@@ -8,7 +8,7 @@
 <div layout:fragment="content">
     <div class="container mt-5">
         <div class="col-md-12">
-            <h2>My Posts</h2>
+            <h2>My Videos</h2>
 
             <!-- Success Message -->
             <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${successMessage}">
@@ -20,38 +20,38 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <!-- No Posts Message -->
-            <div th:if="${#lists.isEmpty(posts)}" class="alert alert-info">
+            <!-- No Videos Message -->
+            <div th:if="${#lists.isEmpty(videos)}" class="alert alert-info">
                 You haven't submitted any videos yet.
             </div>
 
-            <!-- Post Cards Grid -->
-            <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${not #lists.isEmpty(posts)}">
-                <div class="col" th:each="post : ${posts}">
+            <!-- Video Cards Grid -->
+            <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${not #lists.isEmpty(videos)}">
+                <div class="col" th:each="video : ${videos}">
                     <div class="card h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="badge bg-primary" th:text="${post.category.name}">Category</span>
+                            <span class="badge bg-primary" th:text="${video.category.name}">Category</span>
                             <span class="badge" th:classappend="${
-                                post.status == T(com.sivalabs.techtube.posts.domain.PostStatus).APPROVED ? 'bg-success' : 
-                                (post.status == T(com.sivalabs.techtube.posts.domain.PostStatus).PENDING ? 'bg-warning' : 'bg-danger')
-                            }" th:text="${post.status}">Status</span>
+                                video.status == T(com.sivalabs.techtube.videos.domain.VideoStatus).APPROVED ? 'bg-success' :
+                                (video.status == T(com.sivalabs.techtube.videos.domain.VideoStatus).PENDING ? 'bg-warning' : 'bg-danger')
+                            }" th:text="${video.status}">Status</span>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${post.title}">Title</h5>
+                            <h5 class="card-title" th:text="${video.title}">Title</h5>
                             <div class="ratio ratio-16x9 mb-3">
                                 <iframe th:with="videoId=${
-                                post.url.contains('?v=') ? 
-                                post.url.substring(post.url.lastIndexOf('?v=') + 3) : 
-                                (post.url.contains('youtu.be/') ? 
-                                post.url.substring(post.url.lastIndexOf('youtu.be/') + 9) : 
-                                post.url)
+                                video.url.contains('?v=') ?
+                                video.url.substring(video.url.lastIndexOf('?v=') + 3) :
+                                (video.url.contains('youtu.be/') ?
+                                video.url.substring(video.url.lastIndexOf('youtu.be/') + 9) :
+                                video.url)
                             }"
                                         th:src="${'https://www.youtube.com/embed/' + videoId}"
                                         title="YouTube video" allowfullscreen></iframe>
                             </div>
-                            <p class="card-text" th:text="${post.description}">Description</p>
+                            <p class="card-text" th:text="${video.description}">Description</p>
                             <p class="card-text">
-                                <small class="text-muted" th:text="${'Submitted on: ' + #temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
+                                <small class="text-muted" th:text="${'Submitted on: ' + #temporals.format(video.createdAt, 'dd MMM yyyy HH:mm')}">Date</small>
                             </p>
                         </div>
                     </div>

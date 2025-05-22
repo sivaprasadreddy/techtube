@@ -1,4 +1,4 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import org.springframework.data.jpa.repository.JpaRepository
 

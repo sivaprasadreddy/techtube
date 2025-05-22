@@ -1,8 +1,8 @@
-create sequence post_id_seq start with 100 increment by 10;
+create sequence video_id_seq start with 100 increment by 10;
 
-CREATE TABLE posts
+CREATE TABLE videos
 (
-    id          bigint       not null default nextval('post_id_seq'),
+    id          bigint       not null default nextval('video_id_seq'),
     title       varchar(255) not null,
     url         varchar(255) not null,
     description text         not null,
@@ -14,7 +14,7 @@ CREATE TABLE posts
     primary key (id)
 );
 
-insert into posts(id, title, url, description, category_id, created_by, status, created_at) VALUES
+insert into videos(id, title, url, description, category_id, created_by, status, created_at) VALUES
 (1, 'OAuth 2.0 and OpenID Connect (in plain English)', 'https://www.youtube.com/watch?v=996OiexHze0', 'OAuth 2.0 and OpenID Connect (in plain English)', 16, 2, 'APPROVED', '2024-03-06'),
 (2, 'The Why of Go', 'https://www.youtube.com/watch?v=bmZNaUcwBt4', 'The Why of Go', 3, 2, 'APPROVED', '2024-03-09'),
 (3, 'Rob Pike, Public Static Void', 'https://www.youtube.com/watch?v=5kj5ApnhPAE', 'Rob Pike, Public Static Void', 3, 2, 'APPROVED', '2024-04-18'),

@@ -1,7 +1,7 @@
-DELETE FROM posts;
-ALTER SEQUENCE post_id_seq RESTART WITH 100;
+DELETE FROM videos;
+ALTER SEQUENCE video_id_seq RESTART WITH 100;
 
-insert into posts(id, title, url, description, category_id, created_by, status, created_at) VALUES
+insert into videos(id, title, url, description, category_id, created_by, status, created_at) VALUES
 (1, 'OAuth 2.0 and OpenID Connect (in plain English)', 'https://www.youtube.com/watch?v=996OiexHze0', 'OAuth 2.0 and OpenID Connect (in plain English)', 16, 2, 'APPROVED', '2024-03-06'),
 (2, 'The Why of Go', 'https://www.youtube.com/watch?v=bmZNaUcwBt4', 'The Why of Go', 3, 2, 'APPROVED', '2024-03-09'),
 (3, 'Rob Pike, Public Static Void', 'https://www.youtube.com/watch?v=5kj5ApnhPAE', 'Rob Pike, Public Static Void', 3, 2, 'APPROVED', '2024-04-18'),

@@ -11,7 +11,7 @@
         <div class="container">
             <h1 class="display-4">TechTube</h1>
             <p class="lead">A community-driven platform for sharing and discovering high-quality technical videos.</p>
-            <a href="/posts/new" class="btn btn-light btn-lg">Submit Video</a>
+            <a href="/videos/new" class="btn btn-light btn-lg">Submit Video</a>
         </div>
     </div>
 
@@ -20,7 +20,7 @@
 
 
             <!-- Filter Form -->
-            <form id="filterForm" method="get" action="/posts" class="mb-4">
+            <form id="filterForm" method="get" action="/videos" class="mb-4">
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label for="categoryId" class="form-label"><strong>Category</strong></label>
@@ -60,36 +60,37 @@
                 </div>
             </form>
 
-            <!-- No Posts Message -->
-            <div th:if="${#lists.isEmpty(posts.data)}" class="alert alert-info">
+            <!-- No Videos Message -->
+            <div th:if="${#lists.isEmpty(videos.data)}" class="alert alert-info">
                 No tutorials found.
             </div>
 
-            <!-- Post Cards Grid -->
+            <!-- Video Cards Grid -->
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col" th:each="post : ${posts.data}">
+                <div class="col" th:each="video : ${videos.data}">
                     <div class="card h-100">
                         <div class="card-header">
-                            <span class="badge bg-primary" th:text="${post.category.name}">Category</span>
+                            <span class="badge bg-primary" th:text="${video.category.name}">Category</span>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title" th:text="${post.title}">Title</h5>
+                            <h5 class="card-title" th:text="${video.title}">Title</h5>
                             <div class="ratio ratio-16x9 mb-3">
                                 <iframe th:with="videoId=${
-                                post.url.contains('?v=') ? 
-                                post.url.substring(post.url.lastIndexOf('?v=') + 3) : 
-                                (post.url.contains('youtu.be/') ? 
-                                post.url.substring(post.url.lastIndexOf('youtu.be/') + 9) : 
-                                post.url)
+                                video.url.contains('?v=') ?
+                                video.url.substring(video.url.lastIndexOf('?v=') + 3) :
+                                (video.url.contains('youtu.be/') ?
+                                video.url.substring(video.url.lastIndexOf('youtu.be/') + 9) :
+                                video.url)
                             }"
                                         th:src="${'https://www.youtube.com/embed/' + videoId}"
                                         title="YouTube video" allowfullscreen></iframe>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div>
-                                    <th:block  th:if="${post.favorited}" th:insert="~{partials/unfavourite-post}"/>
-                                    <th:block  th:if="${!post.favorited}" th:insert="~{partials/favourite-post}"/>
+                                    <th:block  th:if="${video.favorited}" th:insert="~{partials/unfavourite-video}"/>
+                                    <th:block  th:if="${!video.favorited}" th:insert="~{partials/favourite-video}"/>
                                 </div>
+                                <small class="text-muted" th:text="${#temporals.format(video.createdAt, 'MMM dd, yyyy')}">Date</small>
                             </div>
                         </div>
                     </div>
@@ -97,23 +98,23 @@
             </div>
 
             <!-- Pagination -->
-            <nav aria-label="Page navigation" class="mt-4" th:if="${!#lists.isEmpty(posts.data)}">
+            <nav aria-label="Page navigation" class="mt-4" th:if="${!#lists.isEmpty(videos.data)}">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${!posts.hasPrevious} ? disabled : ''">
+                    <li class="page-item" th:classappend="${!videos.hasPrevious} ? disabled : ''">
                         <a class="page-link" href="#"
-                           th:href="@{/posts(page=1,categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">First</a>
+                           th:href="@{/videos(page=1,categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">First</a>
                     </li>
-                    <li class="page-item" th:classappend="${!posts.hasPrevious} ? disabled : ''">
+                    <li class="page-item" th:classappend="${!videos.hasPrevious} ? disabled : ''">
                         <a class="page-link" href="#"
-                           th:href="@{/posts(page=${posts.pageNumber - 1},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Previous</a>
+                           th:href="@{/videos(page=${videos.pageNumber - 1},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Previous</a>
                     </li>
-                    <li class="page-item" th:classappend="${!posts.hasNext} ? disabled : ''">
+                    <li class="page-item" th:classappend="${!videos.hasNext} ? disabled : ''">
                         <a class="page-link" href="#"
-                           th:href="@{/posts(page=${posts.pageNumber + 1},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Next</a>
+                           th:href="@{/videos(page=${videos.pageNumber + 1},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Next</a>
                     </li>
-                    <li class="page-item" th:classappend="${!posts.hasNext} ? disabled : ''">
+                    <li class="page-item" th:classappend="${!videos.hasNext} ? disabled : ''">
                         <a class="page-link" href="#"
-                           th:href="@{/posts(page=${posts.totalPages},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Last</a>
+                           th:href="@{/videos(page=${videos.totalPages},categoryId=${selectedCategoryId},searchTerm=${searchTerm},sortBy=${sortBy},sortDirection=${sortDirection})}">Last</a>
                     </li>
                 </ul>
             </nav>

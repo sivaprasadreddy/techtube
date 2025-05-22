@@ -22,13 +22,13 @@
                             <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
                         </div>
 
-                        <form id="post-form" method="post" action="/posts" th:action="@{/posts}"
-                              th:object="${postForm}">
+                        <form id="video-form" method="post" action="/videos" th:action="@{/videos}"
+                              th:object="${videoForm}">
                             <!-- Title -->
                             <div class="mb-3">
-                                <label for="post-title" class="form-label">Title <span
+                                <label for="video-title" class="form-label">Title <span
                                         class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="post-title" th:field="*{title}"
+                                <input type="text" class="form-control" id="video-title" th:field="*{title}"
                                        th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
                                        placeholder="Enter the title of the tutorial">
                                 <div class="form-text">A clear, descriptive title that summarizes the content of the
@@ -41,8 +41,8 @@
 
                             <!-- URL -->
                             <div class="mb-3">
-                                <label for="post-url" class="form-label">URL <span class="text-danger">*</span></label>
-                                <input type="url" class="form-control" id="post-url" th:field="*{url}"
+                                <label for="video-url" class="form-label">URL <span class="text-danger">*</span></label>
+                                <input type="url" class="form-control" id="video-url" th:field="*{url}"
                                        th:classappend="${#fields.hasErrors('url')} ? 'is-invalid' : ''"
                                        placeholder="https://www.youtube.com/watch?v=...">
                                 <div class="form-text">The URL of the video tutorial (YouTube, Vimeo, etc.).</div>
@@ -53,9 +53,9 @@
 
                             <!-- Description -->
                             <div class="mb-3">
-                                <label for="post-description" class="form-label">Description <span
+                                <label for="video-description" class="form-label">Description <span
                                         class="text-danger">*</span></label>
-                                <textarea class="form-control" id="post-description" th:field="*{description}" rows="5"
+                                <textarea class="form-control" id="video-description" th:field="*{description}" rows="5"
                                           th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
                                           placeholder="Describe what this tutorial covers..."></textarea>
                                 <div class="form-text">A detailed description of what the tutorial covers and why it's
@@ -68,9 +68,9 @@
 
                             <!-- Category -->
                             <div class="mb-3">
-                                <label for="post-category" class="form-label">Category <span
+                                <label for="video-category" class="form-label">Category <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select" id="post-category" th:field="*{categoryId}" 
+                                <select class="form-select" id="video-category" th:field="*{categoryId}"
                                         th:classappend="${#fields.hasErrors('categoryId')} ? 'is-invalid' : ''"
                                         >
                                     <option value="" selected disabled>Select a category</option>

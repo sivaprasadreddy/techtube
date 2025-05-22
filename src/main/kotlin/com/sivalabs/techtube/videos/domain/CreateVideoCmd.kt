@@ -1,6 +1,6 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
-data class CreatePostCmd(
+data class CreateVideoCmd(
     val title: String,
     val url: String,
     val description: String,

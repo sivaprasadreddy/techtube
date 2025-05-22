@@ -1,4 +1,4 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import com.sivalabs.techtube.users.domain.User
 import jakarta.persistence.Column
@@ -15,13 +15,13 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "posts")
-class Post {
+@Table(name = "videos")
+class Video {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_id_generator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "video_id_generator")
     @SequenceGenerator(
-        name = "post_id_generator",
-        sequenceName = "post_id_seq",
+        name = "video_id_generator",
+        sequenceName = "video_id_seq",
         allocationSize = 10,
     )
     var id: Long? = null
@@ -45,7 +45,7 @@ class Post {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var status: PostStatus = PostStatus.PENDING
+    var status: VideoStatus = VideoStatus.PENDING
 
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()

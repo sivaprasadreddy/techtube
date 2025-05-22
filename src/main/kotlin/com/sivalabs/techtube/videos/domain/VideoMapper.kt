@@ -1,21 +1,21 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import com.sivalabs.techtube.users.domain.User
 import com.sivalabs.techtube.users.domain.UserDTO
 import org.springframework.stereotype.Component
 
 @Component
-class PostMapper {
-    fun toDTO(post: Post): PostDTO =
-        PostDTO(
-            id = post.id ?: 0,
-            title = post.title,
-            url = post.url,
-            description = post.description,
-            category = toCategoryDTO(post.category!!),
-            createdBy = toUserDTO(post.createdBy!!),
-            status = post.status,
-            createdAt = post.createdAt,
+class VideoMapper {
+    fun toDTO(video: Video): VideoDTO =
+        VideoDTO(
+            id = video.id ?: 0,
+            title = video.title,
+            url = video.url,
+            description = video.description,
+            category = toCategoryDTO(video.category!!),
+            createdBy = toUserDTO(video.createdBy!!),
+            status = video.status,
+            createdAt = video.createdAt,
             favorited = false,
         )
 

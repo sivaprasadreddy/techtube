@@ -1,4 +1,4 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -12,10 +12,10 @@ import jakarta.persistence.Table
 @Table(name = "categories")
 class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_id_generator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_id_generator")
     @SequenceGenerator(
-        name = "post_id_generator",
-        sequenceName = "post_id_seq",
+        name = "category_id_generator",
+        sequenceName = "category_id_seq",
         allocationSize = 10,
     )
     var id: Long? = null

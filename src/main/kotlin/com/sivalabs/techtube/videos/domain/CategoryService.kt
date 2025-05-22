@@ -1,4 +1,4 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

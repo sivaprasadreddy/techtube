@@ -39,18 +39,18 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li>
-                            <a class="dropdown-item" href="/posts/new" th:href="@{/posts/new}">
+                            <a class="dropdown-item" href="/posts/new" th:href="@{/videos/new}">
                                 <i class="fa-solid fa-video"></i> Submit Video
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/posts/my-posts" th:href="@{/posts/my-posts}">
-                                <i class="fa-solid fa-user-tag"></i> My Posts
+                            <a class="dropdown-item" href="/videos/my-videos" th:href="@{/videos/my-videos}">
+                                <i class="fa-solid fa-user-tag"></i> My Videos
                             </a>
                         </li>
                         <li sec:authorize="hasRole('ADMIN')">
-                            <a class="dropdown-item" href="/admin/review-posts" th:href="@{/admin/review-posts}">
-                                <i class="fa-solid fa-list-check"></i> Review Posts
+                            <a class="dropdown-item" href="/admin/review-videos" th:href="@{/admin/review-videos}">
+                                <i class="fa-solid fa-list-check"></i> Review Videos
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>

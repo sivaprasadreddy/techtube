@@ -1,8 +1,8 @@
-package com.sivalabs.techtube.posts.web.controllers
+package com.sivalabs.techtube.videos.web.controllers
 
 import com.sivalabs.techtube.BaseIT
-import com.sivalabs.techtube.posts.domain.CreatePostCmd
-import com.sivalabs.techtube.posts.domain.PostService
+import com.sivalabs.techtube.videos.domain.CreateVideoCmd
+import com.sivalabs.techtube.videos.domain.VideoService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,33 +13,33 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.jdbc.Sql
 
 @Sql("classpath:/test-data-setup.sql")
-class PostControllerTests : BaseIT() {
+class VideoControllerTests : BaseIT() {
     @Autowired
-    lateinit var postService: PostService
+    lateinit var videoService: VideoService
 
     @Test
-    fun shouldShowLatestPosts() {
-        val result = mockMvcTester.get().uri("/posts").exchange()
+    fun shouldShowLatestVideos() {
+        val result = mockMvcTester.get().uri("/videos").exchange()
         assertThat(result)
             .hasStatusOk()
     }
 
     @Test
     @WithUserDetails(NORMAL_USER_EMAIL)
-    fun shouldShowCreatePostForm() {
-        val result = mockMvcTester.get().uri("/posts/new").exchange()
+    fun shouldShowCreateVideoForm() {
+        val result = mockMvcTester.get().uri("/videos/new").exchange()
         assertThat(result)
             .hasStatusOk()
-            .hasViewName("posts/create-post")
+            .hasViewName("videos/create-video")
     }
 
     @Test
     @WithUserDetails(NORMAL_USER_EMAIL)
-    fun shouldCreatePostSuccessfully() {
+    fun shouldCreateVideoSuccessfully() {
         val result =
             mockMvcTester
                 .post()
-                .uri("/posts")
+                .uri("/videos")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("title", "How Netflix Uses Java - 2025 Edition")
@@ -49,7 +49,7 @@ class PostControllerTests : BaseIT() {
                 .exchange()
         assertThat(result)
             .hasStatus(HttpStatus.FOUND)
-            .hasRedirectedUrl("/posts")
+            .hasRedirectedUrl("/videos")
             .flash()
             .containsKey("successMessage")
             .hasEntrySatisfying(
@@ -59,114 +59,114 @@ class PostControllerTests : BaseIT() {
 
     @Test
     @WithUserDetails(NORMAL_USER_EMAIL)
-    fun shouldShowMyPosts() {
-        val result = mockMvcTester.get().uri("/posts/my-posts").exchange()
+    fun shouldShowMyVideos() {
+        val result = mockMvcTester.get().uri("/videos/my-videos").exchange()
         assertThat(result)
             .hasStatusOk()
-            .hasViewName("posts/my-posts")
+            .hasViewName("videos/my-videos")
     }
 
     @Test
     @WithUserDetails(ADMIN_USER_EMAIL)
-    fun shouldShowPostsToReview() {
-        val result = mockMvcTester.get().uri("/admin/review-posts").exchange()
+    fun shouldShowVideosToReview() {
+        val result = mockMvcTester.get().uri("/admin/review-videos").exchange()
         assertThat(result)
             .hasStatusOk()
-            .hasViewName("admin/review-posts")
+            .hasViewName("admin/review-videos")
     }
 
     @Test
     @WithUserDetails(ADMIN_USER_EMAIL)
-    fun shouldApprovePost() {
-        val postId = createPost()
+    fun shouldApproveVideo() {
+        val videoId = createVideo()
         val result =
             mockMvcTester
                 .post()
-                .uri("/admin/posts/$postId/approve")
+                .uri("/admin/videos/$videoId/approve")
                 .with(csrf())
                 .exchange()
         assertThat(result)
             .hasStatus(HttpStatus.FOUND)
-            .hasRedirectedUrl("/admin/review-posts")
+            .hasRedirectedUrl("/admin/review-videos")
             .flash()
             .containsKey("successMessage")
             .hasEntrySatisfying(
                 "successMessage",
-            ) { value -> assertThat(value).isEqualTo("Post has been approved successfully.") }
+            ) { value -> assertThat(value).isEqualTo("Video has been approved successfully.") }
     }
 
     @Test
     @WithUserDetails(ADMIN_USER_EMAIL)
-    fun shouldRejectPost() {
-        val postId = 12
+    fun shouldRejectVideo() {
+        val videoId = 12
         val result =
             mockMvcTester
                 .post()
-                .uri("/admin/posts/$postId/reject")
+                .uri("/admin/videos/$videoId/reject")
                 .with(csrf())
                 .exchange()
         assertThat(result)
             .hasStatus(HttpStatus.FOUND)
-            .hasRedirectedUrl("/admin/review-posts")
+            .hasRedirectedUrl("/admin/review-videos")
             .flash()
             .containsKey("successMessage")
             .hasEntrySatisfying(
                 "successMessage",
-            ) { value -> assertThat(value).isEqualTo("Post has been rejected successfully.") }
+            ) { value -> assertThat(value).isEqualTo("Video has been rejected successfully.") }
     }
 
     @Test
     @WithUserDetails(ADMIN_USER_EMAIL)
-    fun shouldUnpublishPost() {
-        val postId = 2
+    fun shouldUnpublishVideo() {
+        val videoId = 2
         val result =
             mockMvcTester
                 .post()
-                .uri("/admin/posts/$postId/unpublish")
+                .uri("/admin/videos/$videoId/unpublish")
                 .with(csrf())
                 .exchange()
         assertThat(result)
             .hasStatus(HttpStatus.FOUND)
-            .hasRedirectedUrl("/admin/review-posts")
+            .hasRedirectedUrl("/admin/review-videos")
             .flash()
             .containsKey("successMessage")
             .hasEntrySatisfying(
                 "successMessage",
-            ) { value -> assertThat(value).isEqualTo("Post has been unpublished successfully.") }
+            ) { value -> assertThat(value).isEqualTo("Video has been unpublished successfully.") }
     }
 
     @Test
     @WithUserDetails(ADMIN_USER_EMAIL)
-    fun shouldDeletePost() {
-        val postId = 3
+    fun shouldDeleteVideo() {
+        val videoId = 3
         val result =
             mockMvcTester
                 .post()
-                .uri("/admin/posts/$postId/delete")
+                .uri("/admin/videos/$videoId/delete")
                 .with(csrf())
                 .exchange()
         assertThat(result)
             .hasStatus(HttpStatus.FOUND)
-            .hasRedirectedUrl("/admin/review-posts")
+            .hasRedirectedUrl("/admin/review-videos")
             .flash()
             .containsKey("successMessage")
             .hasEntrySatisfying(
                 "successMessage",
-            ) { value -> assertThat(value).isEqualTo("Post has been deleted successfully.") }
+            ) { value -> assertThat(value).isEqualTo("Video has been deleted successfully.") }
     }
 
-    private fun createPost(
+    private fun createVideo(
         userId: Long = 1,
         categoryId: Long = 1,
     ): Long {
         val cmd =
-            CreatePostCmd(
-                title = "Test Post",
+            CreateVideoCmd(
+                title = "Test Video",
                 url = "https://www.youtube.com/watch?v=Lyj4of6FO4w",
                 description = "Test Description",
                 categoryId = categoryId,
                 userId = userId,
             )
-        return postService.createPost(cmd)
+        return videoService.createVideo(cmd)
     }
 }

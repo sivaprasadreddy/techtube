@@ -1,16 +1,16 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import com.sivalabs.techtube.users.domain.User
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface FavoriteRepository : JpaRepository<Favorite, Long> {
-    fun existsByUserAndPost(
+    fun existsByUserAndVideo(
         user: User,
-        post: Post,
+        video: Video,
     ): Boolean
 
-    fun deleteByUserAndPost(
+    fun deleteByUserAndVideo(
         user: User,
-        post: Post,
+        video: Video,
     )
 }

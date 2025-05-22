@@ -1,4 +1,4 @@
-package com.sivalabs.techtube.posts.domain
+package com.sivalabs.techtube.videos.domain
 
 import com.sivalabs.techtube.users.domain.User
 import jakarta.persistence.Column
@@ -29,8 +29,8 @@ class Favorite {
     var user: User? = null
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    var post: Post? = null
+    @JoinColumn(name = "video_id", nullable = false)
+    var video: Video? = null
 
     @Column(name = "created_at", nullable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()
