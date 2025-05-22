@@ -111,7 +111,7 @@ class VideoService(
 
     @Transactional
     fun deleteVideo(videoId: Long) {
-        videoRepository.deleteById(videoId)
+        videoRepository.delete(findVideoById(videoId))
     }
 
     @Transactional(readOnly = true)

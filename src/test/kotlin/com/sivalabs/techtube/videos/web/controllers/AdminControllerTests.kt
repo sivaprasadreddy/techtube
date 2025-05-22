@@ -119,4 +119,150 @@ class AdminControllerTests : BaseIT() {
             )
         return videoService.createVideo(cmd)
     }
+
+    // Error scenario tests
+    @Test
+    @WithUserDetails(ADMIN_USER_EMAIL)
+    fun shouldHandleExceptionWhenApprovingNonExistentVideo() {
+        val nonExistentVideoId = 9999L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$nonExistentVideoId/approve")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FOUND)
+            .hasRedirectedUrl("/admin/review-videos")
+            .flash()
+            .containsKey("errorMessage")
+            .hasEntrySatisfying(
+                "errorMessage",
+            ) { value -> assertThat(value).isEqualTo("Video not found with id: 9999") }
+    }
+
+    @Test
+    @WithUserDetails(ADMIN_USER_EMAIL)
+    fun shouldHandleExceptionWhenRejectingNonExistentVideo() {
+        val nonExistentVideoId = 9999L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$nonExistentVideoId/reject")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FOUND)
+            .hasRedirectedUrl("/admin/review-videos")
+            .flash()
+            .containsKey("errorMessage")
+            .hasEntrySatisfying(
+                "errorMessage",
+            ) { value -> assertThat(value).isEqualTo("Video not found with id: 9999") }
+    }
+
+    @Test
+    @WithUserDetails(ADMIN_USER_EMAIL)
+    fun shouldHandleExceptionWhenUnpublishingNonExistentVideo() {
+        val nonExistentVideoId = 9999L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$nonExistentVideoId/unpublish")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FOUND)
+            .hasRedirectedUrl("/admin/review-videos")
+            .flash()
+            .containsKey("errorMessage")
+            .hasEntrySatisfying(
+                "errorMessage",
+            ) { value -> assertThat(value).isEqualTo("Video not found with id: 9999") }
+    }
+
+    @Test
+    @WithUserDetails(ADMIN_USER_EMAIL)
+    fun shouldHandleNonExistentVideoDelete() {
+        val nonExistentVideoId = 9999L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$nonExistentVideoId/delete")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FOUND)
+            .hasRedirectedUrl("/admin/review-videos")
+            .flash()
+            .containsKey("errorMessage")
+            .hasEntrySatisfying(
+                "errorMessage",
+            ) { value -> assertThat(value).isEqualTo("Video not found with id: 9999") }
+    }
+
+    // Unauthorized access tests
+    @Test
+    @WithUserDetails(NORMAL_USER_EMAIL)
+    fun shouldDenyNormalUserAccessToReviewVideos() {
+        val result = mockMvcTester.get().uri("/admin/review-videos").exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    @WithUserDetails(NORMAL_USER_EMAIL)
+    fun shouldDenyNormalUserAccessToApproveVideo() {
+        val videoId = 1L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$videoId/approve")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    @WithUserDetails(NORMAL_USER_EMAIL)
+    fun shouldDenyNormalUserAccessToRejectVideo() {
+        val videoId = 1L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$videoId/reject")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    @WithUserDetails(NORMAL_USER_EMAIL)
+    fun shouldDenyNormalUserAccessToUnpublishVideo() {
+        val videoId = 1L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$videoId/unpublish")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    @WithUserDetails(NORMAL_USER_EMAIL)
+    fun shouldDenyNormalUserAccessToDeleteVideo() {
+        val videoId = 1L
+        val result =
+            mockMvcTester
+                .post()
+                .uri("/admin/videos/$videoId/delete")
+                .with(csrf())
+                .exchange()
+        assertThat(result)
+            .hasStatus(HttpStatus.FORBIDDEN)
+    }
 }
