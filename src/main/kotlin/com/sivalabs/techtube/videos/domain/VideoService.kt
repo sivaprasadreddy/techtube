@@ -8,8 +8,6 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.Optional
-import kotlin.collections.contains
-import kotlin.collections.map
 
 @Service
 class VideoService(
@@ -41,7 +39,7 @@ class VideoService(
         if (currentUser == null) {
             return PagedResult.of(videosPage.map { video -> videoMapper.toDTO(video) })
         }
-        val videoIds = videosPage.content.map { video -> video.id!! }
+        val videoIds = videosPage.content.map { it.id!! }
         val favouritedVideoIds = videoRepository.findFavouriteVideoIds(currentUser.id!!, videoIds)
         val videoDTOsPage = videosPage.map { video -> mapToVideoDTO(video, favouritedVideoIds) }
         return PagedResult.of(videoDTOsPage)
@@ -52,63 +50,62 @@ class VideoService(
         favouritedVideoIds: List<Long>,
     ): VideoDTO {
         val dto = videoMapper.toDTO(video)
-        dto.favorited = favouritedVideoIds.contains(video.id)
+        dto.favorited = video.id in favouritedVideoIds
         return dto
     }
 
     @Transactional
     fun createVideo(cmd: CreateVideoCmd): Long {
-        val user = userRepository.findById(cmd.userId).orElseThrow { IllegalStateException("User not found") }
-        val category = categoryRepository.findById(cmd.categoryId).orElseThrow { IllegalArgumentException("Category not found") }
+        val user = findUserById(cmd.userId)
+        val category = findCategoryById(cmd.categoryId)
 
-        val video = Video()
-        video.title = cmd.title
-        video.url = cmd.url
-        video.description = cmd.description
-        video.category = category
-        video.createdBy = user
-        video.status = VideoStatus.PENDING
+        val video =
+            Video().apply {
+                title = cmd.title
+                url = cmd.url
+                description = cmd.description
+                this.category = category
+                createdBy = user
+                status = VideoStatus.PENDING
+            }
 
         videoRepository.save(video)
         return video.id!!
     }
 
     @Transactional(readOnly = true)
-    fun getPublishedVideos(): List<VideoDTO> = videoRepository.findAllVideosByStatus(VideoStatus.APPROVED).map { videoMapper.toDTO(it) }
+    fun getPublishedVideos(): List<VideoDTO> =
+        videoRepository
+            .findAllVideosByStatus(VideoStatus.APPROVED)
+            .map(videoMapper::toDTO)
 
     @Transactional(readOnly = true)
-    fun getPendingVideos(): List<VideoDTO> = videoRepository.findAllVideosByStatus(VideoStatus.PENDING).map { videoMapper.toDTO(it) }
+    fun getPendingVideos(): List<VideoDTO> =
+        videoRepository
+            .findAllVideosByStatus(VideoStatus.PENDING)
+            .map(videoMapper::toDTO)
 
     @Transactional(readOnly = true)
-    fun getRejectedVideos(): List<VideoDTO> = videoRepository.findAllVideosByStatus(VideoStatus.REJECTED).map { videoMapper.toDTO(it) }
+    fun getRejectedVideos(): List<VideoDTO> =
+        videoRepository
+            .findAllVideosByStatus(VideoStatus.REJECTED)
+            .map(videoMapper::toDTO)
 
     @Transactional
-    fun approveVideo(videoId: Long) {
-        val video =
-            videoRepository
-                .findById(videoId)
-                .orElseThrow { IllegalArgumentException("Video not found with id: $videoId") }
-        video.status = VideoStatus.APPROVED
-        videoRepository.save(video)
-    }
+    fun approveVideo(videoId: Long) = updateVideoStatus(videoId, VideoStatus.APPROVED)
 
     @Transactional
-    fun rejectVideo(videoId: Long) {
-        val video =
-            videoRepository
-                .findById(videoId)
-                .orElseThrow { IllegalArgumentException("Video not found with id: $videoId") }
-        video.status = VideoStatus.REJECTED
-        videoRepository.save(video)
-    }
+    fun rejectVideo(videoId: Long) = updateVideoStatus(videoId, VideoStatus.REJECTED)
 
     @Transactional
-    fun unpublishVideo(videoId: Long) {
-        val video =
-            videoRepository
-                .findById(videoId)
-                .orElseThrow { IllegalArgumentException("Video not found with id: $videoId") }
-        video.status = VideoStatus.PENDING
+    fun unpublishVideo(videoId: Long) = updateVideoStatus(videoId, VideoStatus.PENDING)
+
+    private fun updateVideoStatus(
+        videoId: Long,
+        status: VideoStatus,
+    ) {
+        val video = findVideoById(videoId)
+        video.status = status
         videoRepository.save(video)
     }
 
@@ -120,29 +117,28 @@ class VideoService(
     @Transactional(readOnly = true)
     fun getVideosByUser(userId: Long): List<Video> = videoRepository.findVideosByUserId(userId)
 
-    fun getVideoById(id: Long): Optional<VideoDTO> = videoRepository.findById(id).map { videoMapper.toDTO(it) }
+    fun getVideoById(id: Long): Optional<VideoDTO> =
+        videoRepository
+            .findById(id)
+            .map(videoMapper::toDTO)
 
     @Transactional
     fun favoriteVideo(
         videoId: Long,
         userId: Long,
     ): Boolean {
-        val video =
-            videoRepository
-                .findById(videoId)
-                .orElseThrow { IllegalArgumentException("Video not found with id: $videoId") }
-        val user =
-            userRepository
-                .findById(userId)
-                .orElseThrow { IllegalArgumentException("User not found with id: $userId") }
+        val video = findVideoById(videoId)
+        val user = findUserById(userId)
 
         if (favoriteRepository.existsByUserAndVideo(user, video)) {
             return true // Already favorited
         }
 
-        val favorite = Favorite()
-        favorite.user = user
-        favorite.video = video
+        val favorite =
+            Favorite().apply {
+                this.user = user
+                this.video = video
+            }
         favoriteRepository.save(favorite)
         return true
     }
@@ -152,14 +148,8 @@ class VideoService(
         videoId: Long,
         userId: Long,
     ): Boolean {
-        val video =
-            videoRepository
-                .findById(videoId)
-                .orElseThrow { IllegalArgumentException("Video not found with id: $videoId") }
-        val user =
-            userRepository
-                .findById(userId)
-                .orElseThrow { IllegalArgumentException("User not found with id: $userId") }
+        val video = findVideoById(videoId)
+        val user = findUserById(userId)
 
         if (!favoriteRepository.existsByUserAndVideo(user, video)) {
             return true // Already not favorited
@@ -168,4 +158,20 @@ class VideoService(
         favoriteRepository.deleteByUserAndVideo(user, video)
         return true
     }
+
+    // Helper methods to reduce code duplication
+    private fun findVideoById(videoId: Long): Video =
+        videoRepository
+            .findById(videoId)
+            .orElseThrow { IllegalArgumentException("Video not found with id: $videoId") }
+
+    private fun findUserById(userId: Long): User =
+        userRepository
+            .findById(userId)
+            .orElseThrow { IllegalArgumentException("User not found with id: $userId") }
+
+    private fun findCategoryById(categoryId: Long): Category =
+        categoryRepository
+            .findById(categoryId)
+            .orElseThrow { IllegalArgumentException("Category not found with id: $categoryId") }
 }
