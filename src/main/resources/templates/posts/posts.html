@@ -9,10 +9,9 @@
     <!-- Hero Section -->
     <div class="bg-primary text-white py-5 hero-section">
         <div class="container">
-            <h1 class="display-4">Learn from the Best Tech Tutorials</h1>
-            <p class="lead">A community-driven platform for sharing and discovering high-quality technical video
-                tutorials.</p>
-            <a href="/posts/new" class="btn btn-light btn-lg">Submit a Video</a>
+            <h1 class="display-4">TechTube</h1>
+            <p class="lead">A community-driven platform for sharing and discovering high-quality technical videos.</p>
+            <a href="/posts/new" class="btn btn-light btn-lg">Submit Video</a>
         </div>
     </div>
 
@@ -24,7 +23,7 @@
             <form id="filterForm" method="get" action="/posts" class="mb-4">
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <label for="categoryId" class="form-label">Category</label>
+                        <label for="categoryId" class="form-label"><strong>Category</strong></label>
                         <select class="form-select" id="categoryId" name="categoryId" onchange="this.form.submit()">
                             <option value="">All Categories</option>
                             <option th:each="category : ${categories}"
@@ -36,7 +35,7 @@
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="sortOptions" class="form-label">Sort By</label>
+                        <label for="sortOptions" class="form-label"><strong>Sort By</strong></label>
                         <select class="form-select" id="sortOptions">
                             <option value="createdAt_desc"
                                     th:selected="${sortBy == 'createdAt' && sortDirection == 'desc'}">Posted Date
@@ -51,7 +50,7 @@
                         <input type="hidden" id="sortDirection" name="sortDirection" th:value="${sortDirection}">
                     </div>
                     <div class="col-md-6">
-                        <label for="searchTerm" class="form-label">Search</label>
+                        <label for="searchTerm" class="form-label"><strong>Search</strong></label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="searchTerm" name="searchTerm"
                                    placeholder="Search tutorials..." th:value="${searchTerm}">
@@ -67,7 +66,7 @@
             </div>
 
             <!-- Post Cards Grid -->
-            <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
                 <div class="col" th:each="post : ${posts.data}">
                     <div class="card h-100">
                         <div class="card-header">

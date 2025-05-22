@@ -9,7 +9,7 @@
     <div class="container mt-5">
         <div class="col-md-12">
             <h2>My Posts</h2>
-            
+
             <!-- Success Message -->
             <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${successMessage}">
                 <span th:text="${successMessage}"></span>
@@ -26,7 +26,7 @@
             </div>
 
             <!-- Post Cards Grid -->
-            <div class="row row-cols-1 row-cols-md-2 g-4" th:if="${not #lists.isEmpty(posts)}">
+            <div class="row row-cols-1 row-cols-md-3 g-4" th:if="${not #lists.isEmpty(posts)}">
                 <div class="col" th:each="post : ${posts}">
                     <div class="card h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
