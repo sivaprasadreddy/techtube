@@ -1,3 +1,4 @@
+DELETE FROM favorites;
 DELETE FROM videos;
 ALTER SEQUENCE video_id_seq RESTART WITH 100;
 
