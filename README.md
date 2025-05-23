@@ -25,7 +25,7 @@ Install JDK using [SDKMAN](https://sdkman.io/)
 $ curl -s "https://get.sdkman.io" | bash
 $ source "$HOME/.sdkman/bin/sdkman-init.sh"
 $ sdk install java 21.0.7-tem
-$ sdk install gradle
+$ sdk install maven
 ```
 
 Verify the prerequisites
@@ -44,16 +44,16 @@ $ git clone https://github.com/sivaprasadreddy/techtube.git
 $ cd techtube
 
 # Run tests
-$ ./gradlew test
+$ ./mvnw test
 
 # Automatically format code using spotless plugin
-$ ./gradlew spotlessApply
+$ ./mvnw spotless:apply
 
 # Run/Debug application from IDE
 Run `src/main/kotlin/com/sivalabs/techtube/TechTubeApplication.kt` from IDE.
 
-# Run application using Gradle
-./gradlew bootRun
+# Run application using Maven
+./mvnw spring-boot:run
 ```
 
 * Application: http://localhost:8080

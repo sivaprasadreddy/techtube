@@ -1,7 +1,7 @@
 version: '3'
 vars:
   GOOS: "{{default OS .GOOS}}"
-  GRADLEW: '{{if eq .GOOS "windows"}}gradlew.bat{{else}}./gradlew{{end}}'
+  MVN: '{{if eq .GOOS "windows"}}mvnw.cmd{{else}}./mvnw{{end}}'
   SLEEP_CMD: '{{if eq .GOOS "windows"}}timeout{{else}}sleep{{end}}'
   DC_DIR: "docker"
   DC_FILE: "{{.DC_DIR}}/compose.yml"
@@ -13,15 +13,15 @@ tasks:
   test:
     deps: [format]
     cmds:
-      - "{{.GRADLEW}} build"
+      - "{{.MVN}} verify"
 
   format:
     cmds:
-      - "{{.GRADLEW}} spotlessApply"
+      - "{{.MVN}} spotless:apply"
 
   build_image:
     cmds:
-      - "{{.GRADLEW}} bootBuildImage -x test"
+      - "{{.MVN}} spring-boot:build-image -DskipTests"
   start:
     deps: [build_image]
     cmds:
