@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.sivalabs</groupId>
-    <artifactId>techtube-java</artifactId>
+    <artifactId>techtube</artifactId>
     <version>0.0.1</version>
-    <name>techtube-java</name>
+    <name>techtube</name>
     <description>An application to share good technical videos with the community</description>
 
     <properties>
