@@ -5,10 +5,9 @@ import com.sivalabs.techtube.users.domain.UserRepository
 import com.sivalabs.techtube.videos.domain.CategoryService
 import com.sivalabs.techtube.videos.domain.CreateVideoCmd
 import com.sivalabs.techtube.videos.domain.VideoService
+import com.sivalabs.techtube.videos.web.dto.CreateVideoForm
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.ui.set
@@ -164,16 +163,3 @@ class VideoController(
     }
 }
 
-/**
- * Form object for creating a new video
- */
-data class CreateVideoForm(
-    @field:NotBlank(message = "Title is required")
-    var title: String = "",
-    @field:NotBlank(message = "URL is required")
-    var url: String = "",
-    @field:NotBlank(message = "Description is required")
-    var description: String = "",
-    @field:NotNull(message = "Category is required")
-    var categoryId: Long? = null,
-)
