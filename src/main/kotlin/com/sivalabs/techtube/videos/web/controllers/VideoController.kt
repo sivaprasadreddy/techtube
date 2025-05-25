@@ -29,41 +29,53 @@ class VideoController(
     private val securityService: SecurityService,
     private val userRepository: UserRepository,
 ) {
+    companion object {
+        private const val VIDEOS_LIST_VIEW = "videos/videos"
+        private const val CREATE_VIDEO_VIEW = "videos/create-video"
+        private const val MY_VIDEOS_VIEW = "videos/my-videos"
+        private const val ERROR_MESSAGE = "errorMessage"
+        private const val SUCCESS_MESSAGE = "successMessage"
+    }
+
     @GetMapping("/")
     fun home() = "redirect:/videos"
 
     @GetMapping("/videos")
     fun showVideos(
-        @RequestParam(defaultValue = "1") page: Int,
+        @RequestParam page: Int = 1,
         @RequestParam(required = false) categoryId: Long?,
         @RequestParam(required = false) searchTerm: String?,
-        @RequestParam(defaultValue = "createdAt") sortBy: String,
-        @RequestParam(defaultValue = "desc") sortDirection: String,
+        @RequestParam sortBy: String = "createdAt",
+        @RequestParam sortDirection: String = "desc",
         model: Model,
     ): String {
         val currentUser =
             securityService.getLoginUserId()?.let { userId ->
                 userRepository.findById(userId).orElse(null)
             }
+
         val videos = videoService.getVideos(page, categoryId, searchTerm, sortBy, sortDirection, currentUser)
         val categories = categoryService.getAllCategories()
 
-        model["videos"] = videos
-        model["categories"] = categories
-        model["selectedCategoryId"] = categoryId
-        model["searchTerm"] = searchTerm ?: ""
-        model["sortBy"] = sortBy
-        model["sortDirection"] = sortDirection
+        model.apply {
+            this["videos"] = videos
+            this["categories"] = categories
+            this["selectedCategoryId"] = categoryId
+            this["searchTerm"] = searchTerm ?: ""
+            this["sortBy"] = sortBy
+            this["sortDirection"] = sortDirection
+        }
 
-        return "videos/videos"
+        return VIDEOS_LIST_VIEW
     }
 
     @GetMapping("/videos/new")
     fun showCreateVideoForm(model: Model): String {
-        val categories = categoryService.getAllCategories()
-        model["categories"] = categories
-        model["videoForm"] = CreateVideoForm()
-        return "videos/create-video"
+        model.apply {
+            this["categories"] = categoryService.getAllCategories()
+            this["videoForm"] = CreateVideoForm()
+        }
+        return CREATE_VIDEO_VIEW
     }
 
     @PostMapping("/videos")
@@ -75,10 +87,10 @@ class VideoController(
     ): String {
         if (bindingResult.hasErrors()) {
             model["categories"] = categoryService.getAllCategories()
-            return "videos/create-video"
+            return CREATE_VIDEO_VIEW
         }
 
-        try {
+        return try {
             val userId = securityService.getLoginUserIdOrThrow()
 
             val cmd =
@@ -91,59 +103,77 @@ class VideoController(
                 )
             videoService.createVideo(cmd)
             redirectAttributes.addFlashAttribute(
-                "successMessage",
+                SUCCESS_MESSAGE,
                 "Your video has been submitted and is pending review",
             )
-            return "redirect:/videos"
+            "redirect:/videos"
         } catch (e: Exception) {
-            model["errorMessage"] = e.message ?: "An error occurred while submitting your tutorial."
+            handleError(model, e, "An error occurred while submitting your tutorial.")
             model["categories"] = categoryService.getAllCategories()
-            return "videos/create-video"
+            CREATE_VIDEO_VIEW
         }
     }
-
-    class CreateVideoForm(
-        @field:NotBlank(message = "Title is required")
-        var title: String = "",
-        @field:NotBlank(message = "URL is required")
-        var url: String = "",
-        @field:NotBlank(message = "Description is required")
-        var description: String = "",
-        @field:NotNull(message = "Category is required")
-        var categoryId: Long? = null,
-    )
 
     @GetMapping("/videos/my-videos")
     fun showMyVideos(model: Model): String {
         try {
             val userId = securityService.getLoginUserIdOrThrow()
-            val videos = videoService.getVideosByUser(userId)
-            model["videos"] = videos
+            model["videos"] = videoService.getVideosByUser(userId)
         } catch (e: Exception) {
-            model["errorMessage"] = e.message ?: "An error occurred while retrieving your videos."
+            handleError(model, e, "An error occurred while retrieving your videos.")
         }
-        return "videos/my-videos"
+        return MY_VIDEOS_VIEW
     }
 
     @PostMapping("/videos/{id}/favorite")
     @HxRequest
     fun favoriteVideo(
         @PathVariable id: Long,
-    ): View {
-        val userId = securityService.getLoginUserIdOrThrow()
-        videoService.favoriteVideo(id, userId)
-        val video = videoService.getVideoById(id).orElseThrow { IllegalStateException("Video not found") }
-        return FragmentsRendering.with("partials/unfavourite-video", mapOf("video" to video)).build()
-    }
+    ): View = toggleFavorite(id, true)
 
     @PostMapping("/videos/{id}/unfavorite")
     @HxRequest
     fun unfavoriteVideo(
         @PathVariable id: Long,
+    ): View = toggleFavorite(id, false)
+
+    private fun toggleFavorite(
+        id: Long,
+        favorite: Boolean,
     ): View {
         val userId = securityService.getLoginUserIdOrThrow()
-        videoService.unfavoriteVideo(id, userId)
+
+        if (favorite) {
+            videoService.favoriteVideo(id, userId)
+        } else {
+            videoService.unfavoriteVideo(id, userId)
+        }
+
         val video = videoService.getVideoById(id).orElseThrow { IllegalStateException("Video not found") }
-        return FragmentsRendering.with("partials/favourite-video", mapOf("video" to video)).build()
+        val templateName = if (favorite) "partials/unfavourite-video" else "partials/favourite-video"
+
+        return FragmentsRendering.with(templateName, mapOf("video" to video)).build()
+    }
+
+    private fun handleError(
+        model: Model,
+        e: Exception,
+        defaultMessage: String,
+    ) {
+        model[ERROR_MESSAGE] = e.message ?: defaultMessage
     }
 }
+
+/**
+ * Form object for creating a new video
+ */
+data class CreateVideoForm(
+    @field:NotBlank(message = "Title is required")
+    var title: String = "",
+    @field:NotBlank(message = "URL is required")
+    var url: String = "",
+    @field:NotBlank(message = "Description is required")
+    var description: String = "",
+    @field:NotNull(message = "Category is required")
+    var categoryId: Long? = null,
+)
