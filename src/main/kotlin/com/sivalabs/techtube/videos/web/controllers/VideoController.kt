@@ -5,6 +5,7 @@ import com.sivalabs.techtube.users.domain.UserRepository
 import com.sivalabs.techtube.videos.domain.CategoryService
 import com.sivalabs.techtube.videos.domain.CreateVideoCmd
 import com.sivalabs.techtube.videos.domain.VideoService
+import com.sivalabs.techtube.videos.domain.YouTubeApi
 import com.sivalabs.techtube.videos.web.dto.CreateVideoForm
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest
 import jakarta.validation.Valid
@@ -25,12 +26,14 @@ import org.springframework.web.servlet.view.FragmentsRendering
 class VideoController(
     private val videoService: VideoService,
     private val categoryService: CategoryService,
+    private val youTubeApi: YouTubeApi,
     private val securityService: SecurityService,
     private val userRepository: UserRepository,
 ) {
     companion object {
         private const val VIDEOS_LIST_VIEW = "videos/videos"
         private const val CREATE_VIDEO_VIEW = "videos/create-video"
+        private const val CREATE_VIDEO_FORM_VIEW = "partials/create-video-form"
         private const val MY_VIDEOS_VIEW = "videos/my-videos"
         private const val ERROR_MESSAGE = "errorMessage"
         private const val SUCCESS_MESSAGE = "successMessage"
@@ -75,6 +78,27 @@ class VideoController(
             this["videoForm"] = CreateVideoForm()
         }
         return CREATE_VIDEO_VIEW
+    }
+
+    @GetMapping("/videos/youtube/search")
+    @HxRequest
+    fun populateCreateVideoForm(
+        model: Model,
+        @RequestParam videoId: String,
+    ): String {
+        val form =
+            youTubeApi.getVideoDetails(videoId)?.let { it ->
+                CreateVideoForm(
+                    title = it.title,
+                    url = it.url,
+                    description = it.description,
+                )
+            } ?: CreateVideoForm()
+        model.apply {
+            this["categories"] = categoryService.getAllCategories()
+            this["videoForm"] = form
+        }
+        return CREATE_VIDEO_FORM_VIEW
     }
 
     @PostMapping("/videos")
@@ -162,4 +186,3 @@ class VideoController(
         model[ERROR_MESSAGE] = e.message ?: defaultMessage
     }
 }
-

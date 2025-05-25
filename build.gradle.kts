@@ -61,6 +61,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("commons-io:commons-io:2.18.0")
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
+    implementation("com.google.apis:google-api-services-youtube:v3-rev222-1.25.0")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
