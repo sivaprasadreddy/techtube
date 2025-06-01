@@ -17,8 +17,6 @@
 
     <div class="container mt-5">
         <div class="col-md-12">
-
-
             <!-- Filter Form -->
             <form id="filterForm" method="get" action="/videos" class="mb-4">
                 <div class="row g-3">
@@ -65,37 +63,7 @@
                 No tutorials found.
             </div>
 
-            <!-- Video Cards Grid -->
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col" th:each="video : ${videos.data}">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <span class="badge bg-primary" th:text="${video.category.name}">Category</span>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${video.title}">Title</h5>
-                            <div class="ratio ratio-16x9 mb-3">
-                                <iframe th:with="videoId=${
-                                video.url.contains('?v=') ?
-                                video.url.substring(video.url.lastIndexOf('?v=') + 3) :
-                                (video.url.contains('youtu.be/') ?
-                                video.url.substring(video.url.lastIndexOf('youtu.be/') + 9) :
-                                video.url)
-                            }"
-                                        th:src="${'https://www.youtube.com/embed/' + videoId}"
-                                        title="YouTube video" allowfullscreen></iframe>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div>
-                                    <th:block  th:if="${video.favorited}" th:insert="~{partials/unfavourite-video}"/>
-                                    <th:block  th:if="${!video.favorited}" th:insert="~{partials/favourite-video}"/>
-                                </div>
-                                <small class="text-muted" th:text="${#temporals.format(video.createdAt, 'MMM dd, yyyy')}">Date</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <th:block th:insert="~{partials/videos-grid}"></th:block>
 
             <!-- Pagination -->
             <nav aria-label="Page navigation" class="mt-4" th:if="${!#lists.isEmpty(videos.data)}">

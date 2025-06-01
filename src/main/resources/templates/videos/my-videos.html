@@ -10,15 +10,7 @@
         <div class="col-md-12">
             <h2>My Videos</h2>
 
-            <!-- Success Message -->
-            <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${successMessage}">
-                <span th:text="${successMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            <th:block th:insert="~{partials/action-status}"/>
 
             <!-- No Videos Message -->
             <div th:if="${#lists.isEmpty(videos)}" class="alert alert-info">

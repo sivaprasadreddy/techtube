@@ -35,6 +35,7 @@ class VideoController(
         private const val CREATE_VIDEO_VIEW = "videos/create-video"
         private const val CREATE_VIDEO_FORM_VIEW = "partials/create-video-form"
         private const val MY_VIDEOS_VIEW = "videos/my-videos"
+        private const val MY_FAVORITES_VIEW = "videos/my-favorites"
         private const val ERROR_MESSAGE = "errorMessage"
         private const val SUCCESS_MESSAGE = "successMessage"
     }
@@ -146,6 +147,18 @@ class VideoController(
             handleError(model, e, "An error occurred while retrieving your videos.")
         }
         return MY_VIDEOS_VIEW
+    }
+
+    @GetMapping("/videos/my-favorites")
+    fun showMyFavorites(model: Model): String {
+        try {
+            val userId = securityService.getLoginUserIdOrThrow()
+            val favoritesByUser = videoService.getFavoritesByUser(userId)
+            model["videos"] = mapOf("data" to favoritesByUser)
+        } catch (e: Exception) {
+            handleError(model, e, "An error occurred while retrieving your favorite videos.")
+        }
+        return MY_FAVORITES_VIEW
     }
 
     @PostMapping("/videos/{id}/favorite")

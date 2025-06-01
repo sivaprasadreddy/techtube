@@ -48,6 +48,15 @@ interface VideoRepository : JpaRepository<Video, Long> {
 
     @Query(
         """
+        select v from Video v join fetch v.category join fetch v.createdBy
+        where v.id in (select f.video.id from Favorite f where f.user.id = :userId)
+        order by v.createdAt desc
+    """,
+    )
+    fun findFavoritesByUserId(userId: Long): List<Video>
+
+    @Query(
+        """
         select f.video.id from Favorite f
         where f.video.id in :videoIds and f.user.id = :userId
     """,

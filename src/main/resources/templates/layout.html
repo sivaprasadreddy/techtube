@@ -48,6 +48,11 @@
                                 <i class="fa-solid fa-user-tag"></i> My Videos
                             </a>
                         </li>
+                        <li>
+                            <a class="dropdown-item" href="/videos/my-favorites" th:href="@{/videos/my-favorites}">
+                                <i class="fa-solid fa-heart"></i> My Favorites
+                            </a>
+                        </li>
                         <li sec:authorize="hasRole('ADMIN')">
                             <a class="dropdown-item" href="/admin/review-videos" th:href="@{/admin/review-videos}">
                                 <i class="fa-solid fa-list-check"></i> Review Videos

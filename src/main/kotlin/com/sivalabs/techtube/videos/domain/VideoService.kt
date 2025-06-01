@@ -115,7 +115,22 @@ class VideoService(
     }
 
     @Transactional(readOnly = true)
-    fun getVideosByUser(userId: Long): List<Video> = videoRepository.findVideosByUserId(userId)
+    fun getVideosByUser(userId: Long): List<VideoDTO> =
+        videoRepository
+            .findVideosByUserId(userId)
+            .map(videoMapper::toDTO)
+
+    @Transactional(readOnly = true)
+    fun getFavoritesByUser(userId: Long): List<VideoDTO> =
+        videoRepository
+            .findFavoritesByUserId(userId)
+            .map { it ->
+                videoMapper
+                    .toDTO(it)
+                    .apply {
+                        this.favorited = true
+                    }
+            }
 
     fun getVideoById(id: Long): Optional<VideoDTO> =
         videoRepository

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<body>
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <div class="col-md-12">
+            <h2>My Favorites</h2>
+
+            <th:block th:insert="~{partials/action-status}"/>
+
+            <!-- No Videos Message -->
+            <div th:if="${#lists.isEmpty(videos.data)}" class="alert alert-info">
+                No favorites found.
+            </div>
+            <th:block th:insert="~{partials/videos-grid}"></th:block>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

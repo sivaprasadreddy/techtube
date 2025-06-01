@@ -17,10 +17,7 @@
                         <p class="lead mb-4">Share your favorite technical videos with the community. Once
                             submitted, your tutorial will be reviewed by an admin before being published.</p>
 
-                        <div class="alert alert-danger" role="alert" th:if="${errorMessage}">
-                            <span th:text="${errorMessage}"></span>
-                            <button aria-label="Close" class="btn-close" data-bs-dismiss="alert" type="button"></button>
-                        </div>
+                        <th:block th:insert="~{partials/action-status}"/>
 
                         <form id="ytSearchForm" method="get" class="pb-3">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
